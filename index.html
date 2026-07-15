@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Custom Web Signer</title>
+  <title>Purple Installer</title>
   <!-- Unified Mobile-First Purple Theme -->
   <link rel="stylesheet" href="style.css">
   <!-- Client-side QR Code Engine -->
@@ -13,7 +13,7 @@
 
   <div class="container">
     <div class="custom-card">
-      <h1>Custom Web Signer</h1>
+      <h1>Purple Installer</h1>
       <p class="tagline">Sideload apps directly from official GitHub releases using Daisign</p>
 
       <form id="signerForm">
@@ -54,23 +54,23 @@
           <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)">
         </div>
 
-        <!-- ADVANCED OPTIONS ACCORDION -->
+        <!-- PERMANENT INSTALL ACCORDION -->
         <div class="form-group" style="border: 2px solid var(--border); border-radius: 8px; overflow: hidden; background: #0f131c;">
           <button type="button" id="toggleAdvanced" style="width: 100%; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; background: transparent; border: 0; color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-            <span>⚙ Advanced Options</span>
+            <span>🔗 Permanent Install Option</span>
             <span id="advancedArrow" style="transition: transform 0.2s ease;">▼</span>
           </button>
           
-          <div id="advancedContent" class="hidden" style="padding: 1rem; border-top: 2px solid var(--border); display: none;">
+          <div id="advancedContent" class="hidden" style="padding: 1rem; border-top: 2px solid var(--border); text-align: left;">
             <!-- Warning Notice -->
-            <div style="padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; color: #fbbf24; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem; text-align: left;">
+            <div style="padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; color: #fbbf24; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem;">
               ⚠️ <strong>Permanent Install Notice:</strong> Permanent links rely on the server's GitHub storage. This often hits limits ("file_count limited to 1000 assets per release") and may fail to sign. Use only if you need a link to share.
             </div>
 
             <!-- Permanent Direct Install Toggle -->
-            <div style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <label for="permInstallToggle" style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block;">Permanent Direct Install</label>
+                <label for="permInstallToggle" style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block;">Enable Permanent Install Link</label>
                 <span style="font-size: 0.75rem; color: var(--text-muted);">Creates a persistent installation link to copy and share</span>
               </div>
               <input type="checkbox" id="permInstallToggle" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);">
@@ -85,7 +85,7 @@
       </form>
 
       <!-- PULSING LOADER CONTAINER -->
-      <div id="progressContainer" class="progress-container hidden" style="display: none;">
+      <div id="progressContainer" class="progress-container hidden">
         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
           <span id="progressStatus" style="color: var(--text);">Preparing sign process...</span>
           <span class="animate-pulse" style="color: var(--accent-text);">Processing</span>
@@ -96,10 +96,10 @@
       </div>
 
       <!-- Status / Error Indicator -->
-      <div id="statusArea" class="status-box hidden" style="display: none;"></div>
+      <div id="statusArea" class="status-box hidden"></div>
 
       <!-- Success Result Box -->
-      <div id="resultBox" class="success-card custom-card hidden" style="display: none; margin-top: 1.5rem;">
+      <div id="resultBox" class="success-card custom-card hidden" style="margin-top: 1.5rem;">
         <h3 style="color: var(--success); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
           ✓ App Signed Successfully!
         </h3>
@@ -132,7 +132,7 @@
           </div>
 
           <!-- Dynamically Generated Client-Side Canvas QR Code Section -->
-          <div id="qrContainer" class="hidden" style="display: none; margin-top: 1.25rem; padding: 1rem; background: #0f131c; border: 2px solid var(--border); border-radius: 8px; text-align: center;">
+          <div id="qrContainer" class="hidden" style="margin-top: 1.25rem; padding: 1rem; background: #0f131c; border: 2px solid var(--border); border-radius: 8px; text-align: center;">
             <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600;">Scan with your iOS Camera to install directly</p>
             <div id="qrCanvasWrapper" class="qr-wrapper">
               <!-- Dynamic generated Canvas gets injected here -->
@@ -191,12 +191,12 @@
 
     // Advanced Section Accordion Logic
     toggleAdvanced.addEventListener('click', () => {
-      const isHidden = advancedContent.style.display === 'none' || advancedContent.style.display === '';
+      const isHidden = advancedContent.classList.contains('hidden');
       if (isHidden) {
-        advancedContent.style.display = 'block';
+        advancedContent.classList.remove('hidden');
         advancedArrow.style.transform = 'rotate(180deg)';
       } else {
-        advancedContent.style.display = 'none';
+        advancedContent.classList.add('hidden');
         advancedArrow.style.transform = 'rotate(0deg)';
       }
     });
@@ -208,7 +208,8 @@
       
       const config = APP_CONFIG[appKey];
       try {
-        const response = await fetch(`https://api.github.com/repos/${config.repo}/releases`);
+        // Query parameter per_page=100 ensures we pull in complete version lists past the default API cutoff
+        const response = await fetch(`https://api.github.com/repos/${config.repo}/releases?per_page=100`);
         if (!response.ok) {
           throw new Error(`GitHub returned status code ${response.status}`);
         }
@@ -281,7 +282,7 @@
         }
       } catch (err) {
         console.error(err);
-        versionSelect.innerHTML = `<option value="">Error fetching releases: ${err.message}</option>';
+        versionSelect.innerHTML = '<option value="">Error fetching releases: ' + err.message + '</option>';
       }
     }
 
@@ -316,7 +317,7 @@
     qrBtn.addEventListener('click', () => {
       if (!currentInstallLink) return;
       
-      const isHidden = qrContainer.style.display === 'none' || qrContainer.style.display === '';
+      const isHidden = qrContainer.classList.contains('hidden');
       if (isHidden) {
         // Clear out any old canvas
         qrCanvasWrapper.innerHTML = '';
@@ -342,12 +343,12 @@
             qrCanvasWrapper.appendChild(canvas);
         });
 
-        qrContainer.style.display = 'block';
+        qrContainer.classList.remove('hidden');
         qrBtn.innerText = "Hide QR";
         qrBtn.style.background = "#1f2937";
         qrBtn.style.borderColor = "#374151";
       } else {
-        qrContainer.style.display = 'none';
+        qrContainer.classList.add('hidden');
         qrBtn.innerText = "Show QR Code";
         qrBtn.style.background = "";
         qrBtn.style.borderColor = "";
@@ -359,18 +360,18 @@
       e.preventDefault();
 
       // Clear structural layouts
-      statusArea.style.display = 'none';
+      statusArea.classList.add('hidden');
       statusArea.style.borderColor = '';
       statusArea.style.color = '';
-      resultBox.style.display = 'none';
-      qrContainer.style.display = 'none';
+      resultBox.classList.add('hidden');
+      qrContainer.classList.add('hidden');
       qrBtn.innerText = "Show QR Code";
       qrBtn.style.background = "";
       qrBtn.style.borderColor = "";
       submitBtn.disabled = true;
 
       // Show custom progress container
-      progressContainer.style.display = 'block';
+      progressContainer.classList.remove('hidden');
       progressStatus.innerText = "Sourcing release metadata...";
 
       const p12File = document.getElementById('p12Input').files[0];
@@ -383,8 +384,8 @@
       const selectedIpaUrl = versionSelect.value;
 
       if (!selectedIpaUrl) {
-        progressContainer.style.display = 'none';
-        statusArea.style.display = 'block';
+        progressContainer.classList.add('hidden');
+        statusArea.classList.remove('hidden');
         statusArea.style.borderColor = 'var(--error)';
         statusArea.style.color = 'var(--error)';
         statusArea.innerText = "Error: No release version asset selected.";
@@ -450,7 +451,7 @@
         const data = await response.json();
 
         if (data.successes && data.successes.length > 0) {
-          progressContainer.style.display = 'none';
+          progressContainer.classList.add('hidden');
           
           const app = data.successes[0];
           document.getElementById('appNameDisplay').innerText = `App Name: ${app.displayName}`;
@@ -459,7 +460,7 @@
           
           currentInstallLink = app.installLink;
           
-          resultBox.style.display = 'block';
+          resultBox.classList.remove('hidden');
         } else {
           const failureMsg = data.failures && data.failures.length > 0 
             ? data.failures[0].message || data.failures[0].error || "Sign process failed." 
@@ -469,8 +470,8 @@
 
       } catch (error) {
         console.error(error);
-        progressContainer.style.display = 'none';
-        statusArea.style.display = 'block';
+        progressContainer.classList.add('hidden');
+        statusArea.classList.remove('hidden');
         statusArea.style.borderColor = 'var(--error)';
         statusArea.style.color = 'var(--error)';
         statusArea.innerText = `Error: ${error.message}`;
