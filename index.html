@@ -39,19 +39,28 @@
         <!-- P12 File Input -->
         <div class="form-group">
           <label class="form-label">3. Upload Certificate (.p12)</label>
-          <input type="file" id="p12Input" accept=".p12" required>
+          <label for="p12Input" class="file-upload-label" id="p12Label">
+            <span>Choose .p12 File</span>
+          </label>
+          <input type="file" id="p12Input" class="hidden-file-input" accept=".p12" required>
         </div>
 
         <!-- MobileProvision File Input -->
         <div class="form-group">
           <label class="form-label">4. Provisioning Profile (.mobileprovision)</label>
-          <input type="file" id="provInput" accept=".mobileprovision" required>
+          <label for="provInput" class="file-upload-label" id="provLabel">
+            <span>Choose .mobileprovision File</span>
+          </label>
+          <input type="file" id="provInput" class="hidden-file-input" accept=".mobileprovision" required>
         </div>
 
         <!-- P12 Password Input -->
         <div class="form-group">
           <label class="form-label">5. P12 Password</label>
-          <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)">
+          <div class="password-wrapper">
+            <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)">
+            <button type="button" id="togglePasswordBtn" class="password-toggle-btn">Show</button>
+          </div>
         </div>
 
         <!-- PERMANENT INSTALL ACCORDION -->
@@ -70,10 +79,13 @@
             <!-- Permanent Direct Install Toggle -->
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <label for="permInstallToggle" style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block;">Enable Permanent Install Link</label>
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block;">Enable Permanent Install Link</label>
                 <span style="font-size: 0.75rem; color: var(--text-muted);">Creates a persistent installation link to copy and share</span>
               </div>
-              <input type="checkbox" id="permInstallToggle" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);">
+              <label class="switch">
+                <input type="checkbox" id="permInstallToggle">
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
         </div>
@@ -177,6 +189,16 @@
     const appSelect = document.getElementById('appSelect');
     const versionSelect = document.getElementById('versionSelect');
 
+    // File Input Elements
+    const p12Input = document.getElementById('p12Input');
+    const p12Label = document.getElementById('p12Label');
+    const provInput = document.getElementById('provInput');
+    const provLabel = document.getElementById('provLabel');
+
+    // Password View-Toggle Setup
+    const passwordInput = document.getElementById('passwordInput');
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+
     // Advanced Panel Elements
     const toggleAdvanced = document.getElementById('toggleAdvanced');
     const advancedContent = document.getElementById('advancedContent');
@@ -188,6 +210,34 @@
     const qrCanvasWrapper = document.getElementById('qrCanvasWrapper');
 
     let currentInstallLink = '';
+
+    // File Selection UX Handling (Updates Label Text dynamically)
+    p12Input.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        p12Label.querySelector('span').innerText = e.target.files[0].name;
+        p12Label.classList.add('file-selected');
+      } else {
+        p12Label.querySelector('span').innerText = "Choose .p12 File";
+        p12Label.classList.remove('file-selected');
+      }
+    });
+
+    provInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        provLabel.querySelector('span').innerText = e.target.files[0].name;
+        provLabel.classList.add('file-selected');
+      } else {
+        provLabel.querySelector('span').innerText = "Choose .mobileprovision File";
+        provLabel.classList.remove('file-selected');
+      }
+    });
+
+    // Password Visibility Toggle Logic
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.getAttribute('type') === 'password';
+      passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+      togglePasswordBtn.innerText = isPassword ? 'Hide' : 'Show';
+    });
 
     // Advanced Section Accordion Logic
     toggleAdvanced.addEventListener('click', () => {
@@ -374,9 +424,9 @@
       progressContainer.classList.remove('hidden');
       progressStatus.innerText = "Sourcing release metadata...";
 
-      const p12File = document.getElementById('p12Input').files[0];
-      const provFile = document.getElementById('provInput').files[0];
-      const password = document.getElementById('passwordInput').value;
+      const p12File = p12Input.files[0];
+      const provFile = provInput.files[0];
+      const password = passwordInput.value;
       const permInstallChecked = document.getElementById('permInstallToggle').checked;
 
       const appKey = appSelect.value;
