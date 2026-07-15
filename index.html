@@ -18,7 +18,10 @@
 
     <!-- TAB SWITCHER -->
     <div class="flex bg-slate-900 p-1 rounded-lg mb-6">
-      <button id="tabUpload" type="button" class="flex-1 py-2 text-sm font-medium rounded-md bg-slate-800 text-white shadow">
+      <button id="tabFeather" type="button" class="flex-1 py-2 text-sm font-medium rounded-md bg-slate-800 text-white shadow">
+        Auto Feather
+      </button>
+      <button id="tabUpload" type="button" class="flex-1 py-2 text-sm font-medium rounded-md text-slate-400 hover:text-slate-200">
         Upload IPA File
       </button>
       <button id="tabUrl" type="button" class="flex-1 py-2 text-sm font-medium rounded-md text-slate-400 hover:text-slate-200">
@@ -28,14 +31,19 @@
 
     <form id="signerForm" class="space-y-5">
       
-      <!-- INPUT METHOD 1: IPA File Input -->
-      <div id="ipaFileGroup">
+      <!-- INPUT METHOD 1: Auto Feather (Active by default) -->
+      <div id="ipaFeatherGroup" class="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg text-blue-400 text-xs leading-relaxed">
+        ℹ️ <strong>Auto Fetch Mode:</strong> The site will automatically fetch the latest release of <code>Feather.ipa</code> directly from the official repository and route it to Daisign's backend. No local downloads or CORS proxies needed!
+      </div>
+
+      <!-- INPUT METHOD 2: IPA File Input (Hidden by default) -->
+      <div id="ipaFileGroup" class="hidden">
         <label class="block text-sm font-semibold text-slate-300 mb-2">1. Upload IPA File</label>
         <input type="file" id="ipaInput" accept=".ipa"
                class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
       </div>
 
-      <!-- INPUT METHOD 2: IPA URL Input (Hidden by default) -->
+      <!-- INPUT METHOD 3: IPA URL Input (Hidden by default) -->
       <div id="ipaUrlGroup" class="hidden">
         <label class="block text-sm font-semibold text-slate-300 mb-2">1. Paste Direct IPA URL</label>
         <input type="url" id="ipaUrlInput" placeholder="https://example.com/app.ipa"
@@ -98,7 +106,7 @@
     <!-- PULSING LOADER CONTAINER -->
     <div id="progressContainer" class="hidden mt-6 p-4 bg-slate-850 border border-slate-700 rounded-xl space-y-3">
       <div class="flex justify-between text-xs font-bold text-slate-300">
-        <span id="progressStatus">Uploading assets & signing app...</span>
+        <span id="progressStatus">Preparing sign process...</span>
         <span class="text-blue-400 animate-pulse">Processing</span>
       </div>
       <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden p-[2px]">
@@ -155,8 +163,12 @@
     // Tab Elements
     const tabUpload = document.getElementById('tabUpload');
     const tabUrl = document.getElementById('tabUrl');
+    const tabFeather = document.getElementById('tabFeather');
+    
     const ipaFileGroup = document.getElementById('ipaFileGroup');
     const ipaUrlGroup = document.getElementById('ipaUrlGroup');
+    const ipaFeatherGroup = document.getElementById('ipaFeatherGroup');
+    
     const ipaInput = document.getElementById('ipaInput');
     const ipaUrlInput = document.getElementById('ipaUrlInput');
 
@@ -165,7 +177,7 @@
     const advancedContent = document.getElementById('advancedContent');
     const advancedArrow = document.getElementById('advancedArrow');
 
-    let currentMethod = 'file'; 
+    let currentMethod = 'feather'; // Default mode is Auto Feather
     let currentInstallLink = '';
 
     // Advanced Section Accordion Logic
@@ -180,25 +192,35 @@
       }
     });
 
-    // Tab Navigation Switch
+    // Unified Helper to Manage Tab Switch States
+    function switchTab(selectedMethod, activeTab, elementsToShow, elementsToHide, reqs) {
+      currentMethod = selectedMethod;
+      
+      // Update Tab Visual Styles
+      [tabUpload, tabUrl, tabFeather].forEach(tab => {
+        tab.className = "flex-1 py-2 text-sm font-medium rounded-md text-slate-400 hover:text-slate-200";
+      });
+      activeTab.className = "flex-1 py-2 text-sm font-medium rounded-md bg-slate-800 text-white shadow";
+      
+      // Toggle Form Content Visibility
+      elementsToHide.forEach(el => el.classList.add('hidden'));
+      elementsToShow.forEach(el => el.classList.remove('hidden'));
+      
+      // Handle required attributes dynamically
+      ipaInput.required = reqs.file;
+      ipaUrlInput.required = reqs.url;
+    }
+
+    tabFeather.addEventListener('click', () => {
+      switchTab('feather', tabFeather, [ipaFeatherGroup], [ipaFileGroup, ipaUrlGroup], { file: false, url: false });
+    });
+
     tabUpload.addEventListener('click', () => {
-      currentMethod = 'file';
-      tabUpload.className = "flex-1 py-2 text-sm font-medium rounded-md bg-slate-800 text-white shadow";
-      tabUrl.className = "flex-1 py-2 text-sm font-medium rounded-md text-slate-400 hover:text-slate-200";
-      ipaFileGroup.classList.remove('hidden');
-      ipaUrlGroup.classList.add('hidden');
-      ipaInput.required = true;
-      ipaUrlInput.required = false;
+      switchTab('file', tabUpload, [ipaFileGroup], [ipaFeatherGroup, ipaUrlGroup], { file: true, url: false });
     });
 
     tabUrl.addEventListener('click', () => {
-      currentMethod = 'url';
-      tabUrl.className = "flex-1 py-2 text-sm font-medium rounded-md bg-slate-800 text-white shadow";
-      tabUpload.className = "flex-1 py-2 text-sm font-medium rounded-md text-slate-400 hover:text-slate-200";
-      ipaUrlGroup.classList.remove('hidden');
-      ipaFileGroup.classList.add('hidden');
-      ipaInput.required = false;
-      ipaUrlInput.required = true;
+      switchTab('url', tabUrl, [ipaUrlGroup], [ipaFeatherGroup, ipaFileGroup], { file: false, url: true });
     });
 
     // Copy Link Helper
@@ -230,6 +252,23 @@
       }
     }
 
+    // Helper: Fetches the latest direct Feather download URL via public GitHub API
+    async function getLatestFeatherUrl() {
+      const response = await fetch('https://api.github.com/repos/claration/Feather/releases/latest');
+      if (!response.ok) {
+        throw new Error(`Failed to query GitHub API: status code ${response.status}`);
+      }
+      const data = await response.json();
+      if (!data.assets || data.assets.length === 0) {
+        throw new Error('No assets found in the latest Feather release release.');
+      }
+      const featherIpa = data.assets.find(asset => asset.name === 'Feather.ipa');
+      if (!featherIpa) {
+        throw new Error('Could not locate Feather.ipa in GitHub release assets.');
+      }
+      return featherIpa.browser_download_url;
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -241,7 +280,7 @@
 
       // Show pulsing loader
       progressContainer.classList.remove('hidden');
-      progressStatus.innerText = "Uploading files to daisign.lol (Do not close this tab)...";
+      progressStatus.innerText = "Initializing signer payload...";
 
       const p12File = document.getElementById('p12Input').files[0];
       const provFile = document.getElementById('provInput').files[0];
@@ -255,52 +294,59 @@
       formData.append("mobileprovision", provFile);
       formData.append("p12_password", password);
 
-      // Append 'cyan_fakesign' parameter directly to FormData if toggle is checked
       if (permInstallChecked) {
         formData.append("cyan_fakesign", "on");
       }
 
-      if (currentMethod === 'file') {
-        const ipaFile = ipaInput.files[0];
-        filename = ipaFile.name;
-        formData.append("ipas", ipaFile);
-      } else {
-        const ipaUrl = ipaUrlInput.value.trim();
-        filename = getFilenameFromUrl(ipaUrl);
-        formData.append("ipaUrls", JSON.stringify([ipaUrl]));
-      }
-
-      // Build standard modifications object
-      const modifications = {
-        [filename]: {
-          "appName": "",
-          "version": "",
-          "bundleId": "",
-          "minOsVersion": "",
-          "removeUiDevices": false,
-          "removeWatchApps": false,
-          "enableDocumentSupport": false,
-          "thinToArm64": false,
-          "removeExtensions": false,
-          "ignoreEncryption": false,
-          "removeEmbeddedProvision": false,
-          "injectAdblock": false,
-          "injectSideloadFix": false,
-          "removeUrlSchemes": false,
-          "randomizeBundleId": false,
-          "enableFileSharing": false,
-          "enableProMotion": false,
-          "enableGameMode": false,
-          "isFakesign": false,
-          "hasPermIcon": false, 
-          "hasPermTweaks": false
-        }
-      };
-      
-      formData.append("modifications", JSON.stringify(modifications));
-
       try {
-        // Using standard FETCH to completely bypass preflight OPTIONS blocks
+        // Step 1: Resolve IPA Input types
+        if (currentMethod === 'file') {
+          const ipaFile = ipaInput.files[0];
+          filename = ipaFile.name;
+          formData.append("ipas", ipaFile);
+        } else if (currentMethod === 'url') {
+          const ipaUrl = ipaUrlInput.value.trim();
+          filename = getFilenameFromUrl(ipaUrl);
+          formData.append("ipaUrls", JSON.stringify([ipaUrl]));
+        } else if (currentMethod === 'feather') {
+          progressStatus.innerText = "Fetching latest Feather package release data from GitHub...";
+          const autoIpaUrl = await getLatestFeatherUrl();
+          filename = "Feather.ipa";
+          formData.append("ipaUrls", JSON.stringify([autoIpaUrl]));
+        }
+
+        // Update progress context
+        progressStatus.innerText = "Sideload package dispatched directly to Daisign API...";
+
+        // Step 2: Build Modifications Dictionary for Target IPA name
+        const modifications = {
+          [filename]: {
+            "appName": "",
+            "version": "",
+            "bundleId": "",
+            "minOsVersion": "",
+            "removeUiDevices": false,
+            "removeWatchApps": false,
+            "enableDocumentSupport": false,
+            "thinToArm64": false,
+            "removeExtensions": false,
+            "ignoreEncryption": false,
+            "removeEmbeddedProvision": false,
+            "injectAdblock": false,
+            "injectSideloadFix": false,
+            "removeUrlSchemes": false,
+            "randomizeBundleId": false,
+            "enableFileSharing": false,
+            "enableProMotion": false,
+            "enableGameMode": false,
+            "isFakesign": false,
+            "hasPermIcon": false, 
+            "hasPermTweaks": false
+          }
+        };
+        formData.append("modifications", JSON.stringify(modifications));
+
+        // Step 3: Run Request through Daisign
         const response = await fetch("https://daisign.lol/sign", {
           method: "POST",
           body: formData
