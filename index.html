@@ -4,150 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Custom Web Signer</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Unified Mobile-First Purple Theme -->
+  <link rel="stylesheet" href="style.css">
   <!-- Client-side QR Code Engine -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-6">
+<body>
 
-  <div class="max-w-xl w-full bg-slate-800 border border-slate-700 rounded-2xl shadow-xl p-8">
-    <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-500 text-center mb-2">
-      Custom Web Signer
-    </h1>
-    <p class="text-slate-400 text-sm text-center mb-6">
-      Sideload apps directly from official GitHub releases using Daisign
-    </p>
+  <div class="container">
+    <div class="custom-card">
+      <h1>Custom Web Signer</h1>
+      <p class="tagline">Sideload apps directly from official GitHub releases using Daisign</p>
 
-    <form id="signerForm" class="space-y-5">
-      
-      <!-- 1. APPLICATION SELECTOR -->
-      <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-2">1. Select Application</label>
-        <select id="appSelect" class="w-full px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer">
-          <option value="feather">Feather</option>
-          <option value="ksign">Ksign</option>
-          <option value="sideinstaller">SideInstaller</option>
-        </select>
-      </div>
-
-      <!-- 2. VERSION SELECTOR -->
-      <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-2">2. Select Version</label>
-        <select id="versionSelect" class="w-full px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer" disabled>
-          <option value="">Loading versions...</option>
-        </select>
-      </div>
-
-      <!-- P12 File Input -->
-      <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-2">3. Upload Certificate (.p12)</label>
-        <input type="file" id="p12Input" accept=".p12" required
-               class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
-      </div>
-
-      <!-- MobileProvision File Input -->
-      <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-2">4. Provisioning Profile (.mobileprovision)</label>
-        <input type="file" id="provInput" accept=".mobileprovision" required
-               class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
-      </div>
-
-      <!-- P12 Password Input -->
-      <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-2">5. P12 Password</label>
-        <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)"
-               class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500">
-      </div>
-
-      <!-- ADVANCED OPTIONS DROPDOWN -->
-      <div class="border border-slate-750 rounded-lg bg-slate-850 overflow-hidden">
-        <button type="button" id="toggleAdvanced" class="w-full px-4 py-3 flex justify-between items-center text-sm font-semibold text-slate-300 hover:bg-slate-750/55 transition">
-          <span>⚙ Advanced Options</span>
-          <span id="advancedArrow" class="transform transition-transform">▼</span>
-        </button>
+      <form id="signerForm">
         
-        <div id="advancedContent" class="hidden p-4 border-t border-slate-750 space-y-4">
-          
-          <!-- Warning Notice -->
-          <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400 text-xs leading-relaxed">
-            ⚠️ <strong>Permanent Install Notice:</strong> Permanent links rely on the server's GitHub storage. This often hits limits ("file_count limited to 1000 assets per release") and may fail to sign. Use only if you need a link to share.
-          </div>
+        <!-- 1. APPLICATION SELECTOR -->
+        <div class="form-group">
+          <label class="form-label">1. Select Application</label>
+          <select id="appSelect">
+            <option value="feather">Feather</option>
+            <option value="ksign">Ksign</option>
+            <option value="sideinstaller">SideInstaller</option>
+          </select>
+        </div>
 
-          <!-- Permanent Direct Install Toggle -->
-          <div class="flex items-center justify-between">
-            <div>
-              <label for="permInstallToggle" class="text-sm font-medium text-slate-200 block">Permanent Direct Install</label>
-              <span class="text-xs text-slate-400 font-normal">Creates a persistent installation link to copy and share</span>
+        <!-- 2. VERSION SELECTOR -->
+        <div class="form-group">
+          <label class="form-label">2. Select Version</label>
+          <select id="versionSelect" disabled>
+            <option value="">Loading versions...</option>
+          </select>
+        </div>
+
+        <!-- P12 File Input -->
+        <div class="form-group">
+          <label class="form-label">3. Upload Certificate (.p12)</label>
+          <input type="file" id="p12Input" accept=".p12" required>
+        </div>
+
+        <!-- MobileProvision File Input -->
+        <div class="form-group">
+          <label class="form-label">4. Provisioning Profile (.mobileprovision)</label>
+          <input type="file" id="provInput" accept=".mobileprovision" required>
+        </div>
+
+        <!-- P12 Password Input -->
+        <div class="form-group">
+          <label class="form-label">5. P12 Password</label>
+          <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)">
+        </div>
+
+        <!-- ADVANCED OPTIONS ACCORDION -->
+        <div class="form-group" style="border: 2px solid var(--border); border-radius: 8px; overflow: hidden; background: #0f131c;">
+          <button type="button" id="toggleAdvanced" style="width: 100%; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; background: transparent; border: 0; color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+            <span>⚙ Advanced Options</span>
+            <span id="advancedArrow" style="transition: transform 0.2s ease;">▼</span>
+          </button>
+          
+          <div id="advancedContent" class="hidden" style="padding: 1rem; border-top: 2px solid var(--border); display: none;">
+            <!-- Warning Notice -->
+            <div style="padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; color: #fbbf24; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem; text-align: left;">
+              ⚠️ <strong>Permanent Install Notice:</strong> Permanent links rely on the server's GitHub storage. This often hits limits ("file_count limited to 1000 assets per release") and may fail to sign. Use only if you need a link to share.
             </div>
-            <input type="checkbox" id="permInstallToggle" class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-500 focus:ring-0 cursor-pointer">
+
+            <!-- Permanent Direct Install Toggle -->
+            <div style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+              <div>
+                <label for="permInstallToggle" style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block;">Permanent Direct Install</label>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Creates a persistent installation link to copy and share</span>
+              </div>
+              <input type="checkbox" id="permInstallToggle" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);">
+            </div>
           </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn" class="btn">
+          Sign Application
+        </button>
+      </form>
+
+      <!-- PULSING LOADER CONTAINER -->
+      <div id="progressContainer" class="progress-container hidden" style="display: none;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
+          <span id="progressStatus" style="color: var(--text);">Preparing sign process...</span>
+          <span class="animate-pulse" style="color: var(--accent-text);">Processing</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progressBar" class="progress-bar-fill animate-pulse"></div>
         </div>
       </div>
 
-      <!-- Submit Button -->
-      <button type="submit" id="submitBtn"
-              class="w-full py-3 px-6 bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white font-bold rounded-lg transition-all shadow-md hover:shadow-lg flex justify-center items-center gap-2">
-        <span>Sign Application</span>
-      </button>
-    </form>
+      <!-- Status / Error Indicator -->
+      <div id="statusArea" class="status-box hidden" style="display: none;"></div>
 
-    <!-- PULSING LOADER CONTAINER -->
-    <div id="progressContainer" class="hidden mt-6 p-4 bg-slate-850 border border-slate-700 rounded-xl space-y-3">
-      <div class="flex justify-between text-xs font-bold text-slate-300">
-        <span id="progressStatus">Preparing sign process...</span>
-        <span class="text-blue-400 animate-pulse">Processing</span>
-      </div>
-      <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden p-[2px]">
-        <div id="progressBar" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 h-full w-full rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-      </div>
-    </div>
-
-    <!-- Status / Error Indicator -->
-    <div id="statusArea" class="hidden mt-6 p-4 rounded-lg text-center text-sm font-medium"></div>
-
-    <!-- Success Result Box -->
-    <div id="resultBox" class="hidden mt-6 p-5 bg-slate-850 border border-emerald-500/30 rounded-xl space-y-4">
-      <h3 class="text-emerald-400 font-bold flex items-center gap-2">
-        ✓ App Signed Successfully!
-      </h3>
-      <div class="space-y-3 text-sm">
-        <p class="text-slate-300 font-semibold" id="appNameDisplay"></p>
-        
-        <div class="grid grid-cols-1 gap-2 pt-1">
-          <!-- Direct Install Button -->
-          <a id="installBtn" href="#"
-             class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-semibold text-center transition">
-            Direct Install on iOS
-          </a>
+      <!-- Success Result Box -->
+      <div id="resultBox" class="success-card custom-card hidden" style="display: none; margin-top: 1.5rem;">
+        <h3 style="color: var(--success); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+          ✓ App Signed Successfully!
+        </h3>
+        <div style="font-size: 0.9rem; text-align: left;">
+          <p style="color: var(--text); font-weight: 600; margin-bottom: 1rem;" id="appNameDisplay"></p>
           
-          <!-- Shared Operations Grid -->
-          <div class="grid grid-cols-3 gap-2">
-            <!-- Copy Install Link -->
-            <button id="copyBtn" type="button"
-               class="py-2 px-1 bg-violet-600 hover:bg-violet-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate">
-              Copy Link
-            </button>
-            
-            <!-- Generate/Toggle QR Code -->
-            <button id="qrBtn" type="button"
-               class="py-2 px-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate">
-              Show QR Code
-            </button>
-
-            <!-- Download IPA -->
-            <a id="downloadBtn" href="#" target="_blank"
-               class="py-2 px-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-semibold text-center transition text-[11px] sm:text-xs truncate">
-              Download IPA
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Direct Install Button -->
+            <a id="installBtn" href="#" class="btn" style="background: var(--success); border-color: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+              Direct Install on iOS
             </a>
-          </div>
-        </div>
+            
+            <!-- Shared Operations Grid (Touch Optimized Layout Rows) -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+              <!-- Copy Install Link -->
+              <button id="copyBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
+                Copy Link
+              </button>
+              
+              <!-- Generate/Toggle QR Code -->
+              <button id="qrBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
+                Show QR Code
+              </button>
 
-        <!-- Dynamically Generated Client-Side Canvas QR Code Section -->
-        <div id="qrContainer" class="hidden flex flex-col items-center justify-center p-4 bg-slate-900 border border-slate-700 rounded-lg space-y-2 mt-3 animate-fade-in">
-          <p class="text-[10px] sm:text-xs text-slate-400 text-center font-medium">Scan with your iOS Camera to install directly</p>
-          <div id="qrCanvasWrapper" class="p-3 bg-white rounded-lg shadow-md flex justify-center items-center">
-            <!-- Dynamic generated Canvas gets injected here -->
+              <!-- Download IPA -->
+              <a id="downloadBtn" href="#" target="_blank" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem; background: #1f2937; border-color: #374151; box-shadow: none;">
+                Download IPA
+              </a>
+            </div>
+          </div>
+
+          <!-- Dynamically Generated Client-Side Canvas QR Code Section -->
+          <div id="qrContainer" class="hidden" style="display: none; margin-top: 1.25rem; padding: 1rem; background: #0f131c; border: 2px solid var(--border); border-radius: 8px; text-align: center;">
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600;">Scan with your iOS Camera to install directly</p>
+            <div id="qrCanvasWrapper" class="qr-wrapper">
+              <!-- Dynamic generated Canvas gets injected here -->
+            </div>
           </div>
         </div>
       </div>
@@ -180,7 +169,7 @@
     const statusArea = document.getElementById('statusArea');
     const resultBox = document.getElementById('resultBox');
     
-    // Pulsing Progress Bar Elements
+    // Progress Bar Elements
     const progressContainer = document.getElementById('progressContainer');
     const progressStatus = document.getElementById('progressStatus');
 
@@ -202,12 +191,12 @@
 
     // Advanced Section Accordion Logic
     toggleAdvanced.addEventListener('click', () => {
-      const isHidden = advancedContent.classList.contains('hidden');
+      const isHidden = advancedContent.style.display === 'none' || advancedContent.style.display === '';
       if (isHidden) {
-        advancedContent.classList.remove('hidden');
+        advancedContent.style.display = 'block';
         advancedArrow.style.transform = 'rotate(180deg)';
       } else {
-        advancedContent.classList.add('hidden');
+        advancedContent.style.display = 'none';
         advancedArrow.style.transform = 'rotate(0deg)';
       }
     });
@@ -292,7 +281,7 @@
         }
       } catch (err) {
         console.error(err);
-        versionSelect.innerHTML = `<option value="">Error fetching releases: ${err.message}</option>`;
+        versionSelect.innerHTML = `<option value="">Error fetching releases: ${err.message}</option>';
       }
     }
 
@@ -311,10 +300,12 @@
       try {
         await navigator.clipboard.writeText(currentInstallLink);
         copyBtn.innerText = "Copied!";
-        copyBtn.className = "py-2 px-1 bg-emerald-600 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
+        copyBtn.style.background = "var(--success)";
+        copyBtn.style.borderColor = "var(--success)";
         setTimeout(() => {
           copyBtn.innerText = "Copy Link";
-          copyBtn.className = "py-2 px-1 bg-violet-600 hover:bg-violet-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
+          copyBtn.style.background = "";
+          copyBtn.style.borderColor = "";
         }, 2000);
       } catch (err) {
         alert("Failed to copy link: " + err);
@@ -325,7 +316,7 @@
     qrBtn.addEventListener('click', () => {
       if (!currentInstallLink) return;
       
-      const isHidden = qrContainer.classList.contains('hidden');
+      const isHidden = qrContainer.style.display === 'none' || qrContainer.style.display === '';
       if (isHidden) {
         // Clear out any old canvas
         qrCanvasWrapper.innerHTML = '';
@@ -335,29 +326,31 @@
 
         // Draw the QR Code client-side
         QRCode.toCanvas(canvas, currentInstallLink, {
-            width: 160,       // Matches visual bounds
-            margin: 2,        // Clear container margin
+            width: 150,       
+            margin: 1,        
             color: {
-                dark: '#0f172a',  // Rich Slate-900 for modern look
-                light: '#ffffff'  // Clean white backdrop for reliable camera recognition
+                dark: '#07090d',  
+                light: '#ffffff'  
             }
         }, function (error) {
             if (error) {
                 console.error(error);
-                qrCanvasWrapper.innerHTML = '<span class="text-xs text-red-400">❌ Failed to render QR Code</span>';
+                qrCanvasWrapper.innerHTML = '<span style="font-size: 0.75rem; color: var(--error)">❌ Failed to render QR Code</span>';
                 return;
             }
-            // Append the fully calculated and rendered canvas directly to the UI container
+            // Append the fully calculated canvas directly to the container
             qrCanvasWrapper.appendChild(canvas);
         });
 
-        qrContainer.classList.remove('hidden');
+        qrContainer.style.display = 'block';
         qrBtn.innerText = "Hide QR";
-        qrBtn.className = "py-2 px-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
+        qrBtn.style.background = "#1f2937";
+        qrBtn.style.borderColor = "#374151";
       } else {
-        qrContainer.classList.add('hidden');
+        qrContainer.style.display = 'none';
         qrBtn.innerText = "Show QR Code";
-        qrBtn.className = "py-2 px-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
+        qrBtn.style.background = "";
+        qrBtn.style.borderColor = "";
       }
     });
 
@@ -365,17 +358,19 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Clear layout elements
-      statusArea.classList.add('hidden');
-      statusArea.classList.remove('bg-red-500/20', 'text-red-400');
-      resultBox.classList.add('hidden');
-      qrContainer.classList.add('hidden');
+      // Clear structural layouts
+      statusArea.style.display = 'none';
+      statusArea.style.borderColor = '';
+      statusArea.style.color = '';
+      resultBox.style.display = 'none';
+      qrContainer.style.display = 'none';
       qrBtn.innerText = "Show QR Code";
-      qrBtn.className = "py-2 px-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
+      qrBtn.style.background = "";
+      qrBtn.style.borderColor = "";
       submitBtn.disabled = true;
 
-      // Show pulsing loader
-      progressContainer.classList.remove('hidden');
+      // Show custom progress container
+      progressContainer.style.display = 'block';
       progressStatus.innerText = "Sourcing release metadata...";
 
       const p12File = document.getElementById('p12Input').files[0];
@@ -388,9 +383,10 @@
       const selectedIpaUrl = versionSelect.value;
 
       if (!selectedIpaUrl) {
-        progressContainer.classList.add('hidden');
-        statusArea.classList.remove('hidden');
-        statusArea.classList.add('bg-red-500/20', 'text-red-400');
+        progressContainer.style.display = 'none';
+        statusArea.style.display = 'block';
+        statusArea.style.borderColor = 'var(--error)';
+        statusArea.style.color = 'var(--error)';
         statusArea.innerText = "Error: No release version asset selected.";
         submitBtn.disabled = false;
         return;
@@ -410,7 +406,7 @@
       // Route the direct GitHub download URL directly to Daisign's backend API
       formData.append("ipaUrls", JSON.stringify([selectedIpaUrl]));
 
-      progressStatus.innerText = `Deploying payload data for ${appConfig.name} over to Daisign...`;
+      progressStatus.innerText = `Deploying data for ${appConfig.name} to Daisign...`;
 
       // Build precise modifications object based on active file requirements
       const modifications = {
@@ -454,7 +450,7 @@
         const data = await response.json();
 
         if (data.successes && data.successes.length > 0) {
-          progressContainer.classList.add('hidden');
+          progressContainer.style.display = 'none';
           
           const app = data.successes[0];
           document.getElementById('appNameDisplay').innerText = `App Name: ${app.displayName}`;
@@ -463,7 +459,7 @@
           
           currentInstallLink = app.installLink;
           
-          resultBox.classList.remove('hidden');
+          resultBox.style.display = 'block';
         } else {
           const failureMsg = data.failures && data.failures.length > 0 
             ? data.failures[0].message || data.failures[0].error || "Sign process failed." 
@@ -473,9 +469,10 @@
 
       } catch (error) {
         console.error(error);
-        progressContainer.classList.add('hidden');
-        statusArea.classList.remove('hidden');
-        statusArea.classList.add('bg-red-500/20', 'text-red-400');
+        progressContainer.style.display = 'none';
+        statusArea.style.display = 'block';
+        statusArea.style.borderColor = 'var(--error)';
+        statusArea.style.color = 'var(--error)';
         statusArea.innerText = `Error: ${error.message}`;
       } finally {
         submitBtn.disabled = false;
