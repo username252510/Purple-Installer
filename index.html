@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Custom Web Signer</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Client-side QR Code Engine -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-6">
 
@@ -13,7 +16,7 @@
       Custom Web Signer
     </h1>
     <p class="text-slate-400 text-sm text-center mb-6">
-      Sign and install your iOS apps using the Daisuke backend API
+      Sideload apps directly from official GitHub releases using Daisign
     </p>
 
     <form id="signerForm" class="space-y-5">
@@ -118,17 +121,33 @@
             Direct Install on iOS
           </a>
           
-          <div class="flex gap-2">
-            <!-- Copy Install Link Button -->
+          <!-- Shared Operations Grid -->
+          <div class="grid grid-cols-3 gap-2">
+            <!-- Copy Install Link -->
             <button id="copyBtn" type="button"
-               class="flex-1 py-2 px-3 bg-violet-600 hover:bg-violet-500 text-white rounded font-semibold text-center transition text-xs">
-              Copy Install Link
+               class="py-2 px-1 bg-violet-600 hover:bg-violet-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate">
+              Copy Link
             </button>
-            <!-- Download IPA Button -->
+            
+            <!-- Generate/Toggle QR Code -->
+            <button id="qrBtn" type="button"
+               class="py-2 px-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate">
+              Show QR Code
+            </button>
+
+            <!-- Download IPA -->
             <a id="downloadBtn" href="#" target="_blank"
-               class="flex-1 py-2 px-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-semibold text-center transition text-xs">
-              Download Signed IPA
+               class="py-2 px-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-semibold text-center transition text-[11px] sm:text-xs truncate">
+              Download IPA
             </a>
+          </div>
+        </div>
+
+        <!-- Dynamically Generated Client-Side Canvas QR Code Section -->
+        <div id="qrContainer" class="hidden flex flex-col items-center justify-center p-4 bg-slate-900 border border-slate-700 rounded-lg space-y-2 mt-3 animate-fade-in">
+          <p class="text-[10px] sm:text-xs text-slate-400 text-center font-medium">Scan with your iOS Camera to install directly</p>
+          <div id="qrCanvasWrapper" class="p-3 bg-white rounded-lg shadow-md flex justify-center items-center">
+            <!-- Dynamic generated Canvas gets injected here -->
           </div>
         </div>
       </div>
@@ -136,7 +155,7 @@
   </div>
 
   <script>
-    // GitHub API targets for the applications
+    // Config details for targeted repositories
     const APP_CONFIG = {
       feather: {
         name: "Feather",
@@ -174,6 +193,11 @@
     const advancedContent = document.getElementById('advancedContent');
     const advancedArrow = document.getElementById('advancedArrow');
 
+    // QR & Actions Elements
+    const qrBtn = document.getElementById('qrBtn');
+    const qrContainer = document.getElementById('qrContainer');
+    const qrCanvasWrapper = document.getElementById('qrCanvasWrapper');
+
     let currentInstallLink = '';
 
     // Advanced Section Accordion Logic
@@ -188,7 +212,7 @@
       }
     });
 
-    // Populate Version Dropdown dynamically by querying public GitHub releases API
+    // Populate Version Dropdown & Default to the true "Latest Stable" Release
     async function updateVersions(appKey) {
       versionSelect.disabled = true;
       versionSelect.innerHTML = '<option value="">Loading versions...</option>';
@@ -204,8 +228,35 @@
         versionSelect.innerHTML = '';
         let matchCount = 0;
 
+        // Step 1: Query the array to find the first genuine (non-prerelease) with the asset
+        let defaultStableUrl = null;
+        for (const release of releases) {
+          if (!release.prerelease) {
+            const ipaAsset = release.assets.find(
+              asset => asset.name.toLowerCase() === config.fileName.toLowerCase()
+            );
+            if (ipaAsset) {
+              defaultStableUrl = ipaAsset.browser_download_url;
+              break;
+            }
+          }
+        }
+
+        // Fallback: If absolutely everything is flagged as a prerelease, use the absolute first asset found
+        if (!defaultStableUrl) {
+          for (const release of releases) {
+            const ipaAsset = release.assets.find(
+              asset => asset.name.toLowerCase() === config.fileName.toLowerCase()
+            );
+            if (ipaAsset) {
+              defaultStableUrl = ipaAsset.browser_download_url;
+              break;
+            }
+          }
+        }
+
+        // Step 2: Build the dropdown items
         releases.forEach((release) => {
-          // Find target IPA asset (case-insensitive find)
           const ipaAsset = release.assets.find(
             asset => asset.name.toLowerCase() === config.fileName.toLowerCase()
           );
@@ -214,9 +265,20 @@
             const option = document.createElement('option');
             option.value = ipaAsset.browser_download_url;
             
-            const releaseName = release.name || release.tag_name;
-            // First item with a valid asset automatically defaults to "Latest"
-            option.textContent = matchCount === 0 ? `${releaseName} (Latest)` : releaseName;
+            let releaseName = release.name || release.tag_name;
+            
+            // Append Beta/Pre-release tags visually so the user has context
+            if (release.prerelease) {
+              releaseName += " (Beta)";
+            }
+
+            // Set dynamic selection and highlight status
+            if (ipaAsset.browser_download_url === defaultStableUrl) {
+              option.selected = true;
+              option.textContent = `${releaseName} (Latest Stable)`;
+            } else {
+              option.textContent = releaseName;
+            }
             
             versionSelect.appendChild(option);
             matchCount++;
@@ -239,7 +301,7 @@
       updateVersions(e.target.value);
     });
 
-    // Initialize versions for the default selected application (Feather) on load
+    // Initialize versions for default selection (Feather) on load
     updateVersions(appSelect.value);
 
     // Copy Link Helper
@@ -249,28 +311,72 @@
       try {
         await navigator.clipboard.writeText(currentInstallLink);
         copyBtn.innerText = "Copied!";
-        copyBtn.className = "flex-1 py-2 px-3 bg-emerald-600 text-white rounded font-semibold text-center transition text-xs";
+        copyBtn.className = "py-2 px-1 bg-emerald-600 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
         setTimeout(() => {
-          copyBtn.innerText = "Copy Install Link";
-          copyBtn.className = "flex-1 py-2 px-3 bg-violet-600 hover:bg-violet-500 text-white rounded font-semibold text-center transition text-xs";
+          copyBtn.innerText = "Copy Link";
+          copyBtn.className = "py-2 px-1 bg-violet-600 hover:bg-violet-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
         }, 2000);
       } catch (err) {
         alert("Failed to copy link: " + err);
       }
     });
 
+    // Dynamic, Client-Side QR Code Engine Generation
+    qrBtn.addEventListener('click', () => {
+      if (!currentInstallLink) return;
+      
+      const isHidden = qrContainer.classList.contains('hidden');
+      if (isHidden) {
+        // Clear out any old canvas
+        qrCanvasWrapper.innerHTML = '';
+
+        // Create a native canvas element
+        const canvas = document.createElement('canvas');
+
+        // Draw the QR Code client-side
+        QRCode.toCanvas(canvas, currentInstallLink, {
+            width: 160,       // Matches visual bounds
+            margin: 2,        // Clear container margin
+            color: {
+                dark: '#0f172a',  // Rich Slate-900 for modern look
+                light: '#ffffff'  // Clean white backdrop for reliable camera recognition
+            }
+        }, function (error) {
+            if (error) {
+                console.error(error);
+                qrCanvasWrapper.innerHTML = '<span class="text-xs text-red-400">❌ Failed to render QR Code</span>';
+                return;
+            }
+            // Append the fully calculated and rendered canvas directly to the UI container
+            qrCanvasWrapper.appendChild(canvas);
+        });
+
+        qrContainer.classList.remove('hidden');
+        qrBtn.innerText = "Hide QR";
+        qrBtn.className = "py-2 px-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
+      } else {
+        qrContainer.classList.add('hidden');
+        qrBtn.innerText = "Show QR Code";
+        qrBtn.className = "py-2 px-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
+      }
+    });
+
+    // Sign Application Submit Logic
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Clear UI state
+      // Clear layout elements
       statusArea.classList.add('hidden');
       statusArea.classList.remove('bg-red-500/20', 'text-red-400');
       resultBox.classList.add('hidden');
+      qrContainer.classList.add('hidden');
+      qrBtn.innerText = "Show QR Code";
+      qrBtn.className = "py-2 px-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-semibold text-center transition text-[11px] sm:text-xs truncate";
       submitBtn.disabled = true;
 
       // Show pulsing loader
       progressContainer.classList.remove('hidden');
-      progressStatus.innerText = "Sourcing IPA URL parameters...";
+      progressStatus.innerText = "Sourcing release metadata...";
 
       const p12File = document.getElementById('p12Input').files[0];
       const provFile = document.getElementById('provInput').files[0];
@@ -285,7 +391,7 @@
         progressContainer.classList.add('hidden');
         statusArea.classList.remove('hidden');
         statusArea.classList.add('bg-red-500/20', 'text-red-400');
-        statusArea.innerText = "Error: No release asset selected or loaded.";
+        statusArea.innerText = "Error: No release version asset selected.";
         submitBtn.disabled = false;
         return;
       }
@@ -301,12 +407,12 @@
         formData.append("cyan_fakesign", "on");
       }
 
-      // Route the direct GitHub download URL directly to the backend
+      // Route the direct GitHub download URL directly to Daisign's backend API
       formData.append("ipaUrls", JSON.stringify([selectedIpaUrl]));
 
-      progressStatus.innerText = `Sending ${appConfig.name} package metadata directly to Daisign...`;
+      progressStatus.innerText = `Deploying payload data for ${appConfig.name} over to Daisign...`;
 
-      // Build modifications object mapped to the correct dynamic filename
+      // Build precise modifications object based on active file requirements
       const modifications = {
         [filename]: {
           "appName": "",
