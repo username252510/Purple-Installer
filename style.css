@@ -181,29 +181,122 @@ input:focus, select:focus {
   box-shadow: 0 0 12px var(--accent-glow);
 }
 
-/* Custom Styled File Input Wrappers */
-input[type="file"] {
-  width: 100%;
+/* Clean Custom Styled Invisible File Upload Setup */
+.hidden-file-input {
+  display: none !important;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0.75rem 1rem;
+  background: #11151f;
+  border: 2px dashed var(--border);
   color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-input[type="file"]::-webkit-file-upload-button {
-  min-height: 38px;
-  padding: 0 1rem;
-  border-radius: 6px;
-  border: 0;
-  background: var(--accent);
-  color: #ffffff;
-  font-weight: 600;
-  font-family: inherit;
-  margin-right: 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
-input[type="file"]::-webkit-file-upload-button:hover {
-  background: var(--accent-text);
+.file-upload-label:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(109, 40, 217, 0.05);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Change style when file is selected */
+.file-upload-label.file-selected {
+  border-style: solid;
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  background: rgba(109, 40, 217, 0.08);
+}
+
+/* Toggle Switch Styling */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #11151f;
+  border: 2px solid var(--border);
+  transition: .3s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-muted);
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+  background-color: #ffffff;
+}
+
+/* Password View-Toggle Design */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  padding-right: 4.5rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--accent-text);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #ffffff;
 }
 
 /* ==========================================================================
