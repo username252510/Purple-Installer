@@ -116,12 +116,12 @@ body::before {
    TYPOGRAPHY
    ========================================================================== */
 h1 {
-  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-size: clamp(1.75rem, 5vw, 2.5rem); /* Scaled down slightly for PC screens */
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-align: center;
-  background: linear-gradient(135deg, #ffffff 30%, var(--accent-text) 100%);
+  background: linear-gradient(135deg, #c084fc 0%, #a78bfa 50%, #818cf8 100%); /* Purple/Violet/Indigo Gradient */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
@@ -325,6 +325,11 @@ input[type="file"]::-webkit-file-upload-button:hover {
   border-radius: 10px;
   display: inline-block;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Global Hidden Visibility Controller */
+.hidden {
+  display: none !important;
 }
 
 /* Responsive Grid Engine adjustments for iPads/Tablets */
