@@ -17,7 +17,10 @@
 </head>
 <body>
 
-  <div class="container">
+  <!-- ==========================================
+       VIEW 1: INSTALLER VIEW (Main Page)
+       ========================================== -->
+  <div id="installer-view" class="container">
     <div class="custom-card">
       <h1>Purple Installer</h1>
       <p class="tagline">Sideload apps directly from official GitHub releases using Daisign</p>
@@ -42,53 +45,52 @@
           </select>
         </div>
 
-        <!-- CERTIFICATE MANAGER SECTION -->
-        <div class="form-group" style="border: 2px dashed var(--border); padding: 1rem; border-radius: 8px; background: #0f131c; margin-bottom: 1.5rem;">
-          <label class="form-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span>📂 Saved Certificates</span>
-          </label>
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-            <select id="savedCertSelect" style="flex: 1;">
-              <option value="">-- Select a saved certificate --</option>
-            </select>
-            <button type="button" id="deleteCertBtn" class="btn" style="width: auto; background: #ef4444; border-color: #ef4444; padding: 0 0.75rem; font-size: 0.75rem; min-height: 38px; display: none; margin: 0;">
-              Delete
+        <!-- 3. CERTIFICATE SELECTOR TABS -->
+        <div class="form-group">
+          <label class="form-label">3. Select Certificate Source</label>
+          
+          <!-- Aesthetic Browser Tabs Selector -->
+          <div class="cert-tab-selector">
+            <button type="button" class="cert-tab-btn active" data-source="upload">
+              Upload Files
+            </button>
+            <button type="button" class="cert-tab-btn" data-source="saved">
+              Saved Certificates
             </button>
           </div>
-          
-          <div style="border-top: 1px solid var(--border); padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
-            <label class="form-label" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0;">Save current cert files & password:</label>
-            <div style="display: flex; gap: 0.5rem;">
-              <input type="text" id="newCertName" placeholder="Name (e.g., MapleSign)" style="flex: 1; font-size: 0.8rem; padding: 0.5rem;">
-              <button type="button" id="saveCertBtn" class="btn" style="width: auto; padding: 0 0.75rem; font-size: 0.75rem; min-height: 38px; margin: 0;">
-                Save
-              </button>
+
+          <!-- Upload Files Form Fields -->
+          <div id="uploadCertFields" class="tab-content-active">
+            <!-- P12 File Input -->
+            <div class="form-group" style="margin-top: 1rem;">
+              <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Upload Certificate (.p12)</label>
+              <label for="p12Input" class="file-upload-label" id="p12Label">
+                <span>Choose .p12 File</span>
+              </label>
+              <input type="file" id="p12Input" class="hidden-file-input" accept=".p12">
             </div>
-            <p id="saveCertStatus" class="hidden" style="font-size: 0.7rem; color: #10b981; margin: 0; font-weight: 600;"></p>
+
+            <!-- MobileProvision File Input -->
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Provisioning Profile (.mobileprovision)</label>
+              <label for="provInput" class="file-upload-label" id="provLabel">
+                <span>Choose .mobileprovision File</span>
+              </label>
+              <input type="file" id="provInput" class="hidden-file-input" accept=".mobileprovision">
+            </div>
+          </div>
+
+          <!-- Saved Certificates Boxes Container -->
+          <div id="savedCertFields" class="tab-content-hidden hidden">
+            <div id="savedCertsGrid" class="cert-grid">
+              <!-- Dynamically populated card-like selector boxes go here -->
+            </div>
           </div>
         </div>
 
-        <!-- P12 File Input (Removed 'required' attribute to handle JS validation) -->
+        <!-- P12 Password Input (Shared across both modes) -->
         <div class="form-group">
-          <label class="form-label">3. Upload Certificate (.p12)</label>
-          <label for="p12Input" class="file-upload-label" id="p12Label">
-            <span>Choose .p12 File</span>
-          </label>
-          <input type="file" id="p12Input" class="hidden-file-input" accept=".p12">
-        </div>
-
-        <!-- MobileProvision File Input (Removed 'required' attribute to handle JS validation) -->
-        <div class="form-group">
-          <label class="form-label">4. Provisioning Profile (.mobileprovision)</label>
-          <label for="provInput" class="file-upload-label" id="provLabel">
-            <span>Choose .mobileprovision File</span>
-          </label>
-          <input type="file" id="provInput" class="hidden-file-input" accept=".mobileprovision">
-        </div>
-
-        <!-- P12 Password Input -->
-        <div class="form-group">
-          <label class="form-label">5. P12 Password</label>
+          <label class="form-label">4. P12 Password</label>
           <div class="password-wrapper">
             <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)">
             <button type="button" id="togglePasswordBtn" class="password-toggle-btn">Show</button>
@@ -103,12 +105,10 @@
           </button>
           
           <div id="advancedContent" class="hidden" style="padding: 1rem; border-top: 2px solid var(--border); text-align: left;">
-            <!-- Warning Notice -->
             <div style="padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; color: #fbbf24; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem;">
               ⚠️ <strong>Permanent Install Notice:</strong> Permanent links rely on the server's GitHub storage. This often hits limits ("file_count limited to 1000 assets per release") and may fail to sign. Use only if you need a link to share.
             </div>
 
-            <!-- Permanent Direct Install Toggle -->
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div>
                 <label style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block;">Enable Permanent Install Link</label>
@@ -151,44 +151,121 @@
           <p style="color: var(--text); font-weight: 600; margin-bottom: 1rem;" id="appNameDisplay"></p>
           
           <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <!-- Direct Install Button -->
             <a id="installBtn" href="#" class="btn" style="background: var(--success); border-color: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
               Direct Install on iOS
             </a>
             
-            <!-- Shared Operations Grid (Touch Optimized Layout Rows) -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
-              <!-- Copy Install Link -->
               <button id="copyBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
                 Copy Link
               </button>
               
-              <!-- Generate/Toggle QR Code -->
               <button id="qrBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
                 Show QR Code
               </button>
 
-              <!-- Download IPA -->
               <a id="downloadBtn" href="#" target="_blank" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem; background: #1f2937; border-color: #374151; box-shadow: none;">
                 Download IPA
               </a>
             </div>
           </div>
 
-          <!-- Dynamically Generated Client-Side Canvas QR Code Section -->
           <div id="qrContainer" class="hidden" style="margin-top: 1.25rem; padding: 1rem; background: #0f131c; border: 2px solid var(--border); border-radius: 8px; text-align: center;">
             <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600;">Scan with your iOS Camera to install directly</p>
-            <div id="qrCanvasWrapper" class="qr-wrapper">
-              <!-- Dynamic generated Canvas gets injected here -->
-            </div>
+            <div id="qrCanvasWrapper" class="qr-wrapper"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+
+  <!-- ==========================================
+       VIEW 2: DEDICATED CERTIFICATE MANAGEMENT VIEW
+       ========================================== -->
+  <div id="certificates-view" class="container hidden">
+    <div class="custom-card">
+      <h1>Certificates</h1>
+      <p class="tagline">Store development credentials securely in your native local storage</p>
+
+      <!-- Store Form -->
+      <form id="saveCertForm" style="margin-bottom: 2rem;">
+        
+        <div class="form-group">
+          <label class="form-label">1. Certificate Name</label>
+          <input type="text" id="newCertName" placeholder="e.g. MapleSign, Feather Dev" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">2. Upload Certificate (.p12)</label>
+          <label for="mgrP12Input" class="file-upload-label" id="mgrP12Label">
+            <span>Choose .p12 File</span>
+          </label>
+          <input type="file" id="mgrP12Input" class="hidden-file-input" accept=".p12" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">3. Provisioning Profile (.mobileprovision)</label>
+          <label for="mgrProvInput" class="file-upload-label" id="mgrProvLabel">
+            <span>Choose .mobileprovision File</span>
+          </label>
+          <input type="file" id="mgrProvInput" class="hidden-file-input" accept=".mobileprovision" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">4. Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="mgrPasswordInput" placeholder="Certificate password (leave blank if none)">
+            <button type="button" id="toggleMgrPasswordBtn" class="password-toggle-btn">Show</button>
+          </div>
+        </div>
+
+        <button type="submit" id="mgrSaveBtn" class="btn">
+          Save Secure Certificate
+        </button>
+      </form>
+
+      <!-- Active Database / Storage Status -->
+      <div style="border-top: 2px solid var(--border); padding-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="margin: 0; font-size: 1.1rem; color: #fff;">Stored Credentials</h2>
+          <button type="button" id="deleteAllCertsBtn" class="btn" style="width: auto; padding: 0.5rem 1rem; min-height: 38px; background: #ef4444; border-color: #ef4444; font-size: 0.8rem; margin: 0;">
+            Delete All
+          </button>
+        </div>
+
+        <!-- Render active saved databases inside the certificates view -->
+        <div id="mgrCertsGrid" class="cert-grid" style="margin-bottom: 2rem;">
+          <!-- Active list details generated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       APPLE LIQUID GLASS BOTTOM NAVIGATION
+       ========================================== -->
+  <div class="liquid-nav">
+    <!-- Sliding Glass Highlight Indicator Bubble -->
+    <div class="liquid-bubble"></div>
+    
+    <a href="/Purple-Installer/" class="liquid-nav-item active" data-route="installer">
+      <span class="liquid-nav-icon">📦</span>
+      <span class="liquid-nav-label">Installer</span>
+    </a>
+    <a href="/Purple-Installer/certificates/" class="liquid-nav-item" data-route="certificates">
+      <span class="liquid-nav-icon">🔑</span>
+      <span class="liquid-nav-label">Certificates</span>
+    </a>
+  </div>
+
+
+  <!-- ==========================================
+       MAIN JAVASCRIPT LOGIC BLOCK
+       ========================================== -->
   <script>
-    // Config details for targeted repositories
+    // GitHub repositories and files metadata configuration
     const APP_CONFIG = {
       feather: {
         name: "Feather",
@@ -207,61 +284,125 @@
       }
     };
 
-    // UI Elements
+    // Global variables storing references to active blobs
+    let activeP12File = null;
+    let activeProvFile = null;
+    let currentInstallLink = '';
+    let selectedCertId = null;
+
+    // Active manager specific fields to distinguish from form
+    let managerActiveP12 = null;
+    let managerActiveProv = null;
+
+    // UI Document Targets
     const form = document.getElementById('signerForm');
     const submitBtn = document.getElementById('submitBtn');
     const statusArea = document.getElementById('statusArea');
     const resultBox = document.getElementById('resultBox');
     
-    // Progress Bar Elements
+    // UI Progress Bars
     const progressContainer = document.getElementById('progressContainer');
     const progressStatus = document.getElementById('progressStatus');
-
-    // App Selectors
     const appSelect = document.getElementById('appSelect');
     const versionSelect = document.getElementById('versionSelect');
 
-    // File Input Elements
+    // Installer Input Fields
     const p12Input = document.getElementById('p12Input');
     const p12Label = document.getElementById('p12Label');
     const provInput = document.getElementById('provInput');
     const provLabel = document.getElementById('provLabel');
-
-    // Password View-Toggle Setup
     const passwordInput = document.getElementById('passwordInput');
     const togglePasswordBtn = document.getElementById('togglePasswordBtn');
 
-    // Advanced Panel Elements
+    // Manager View Input Fields
+    const saveCertForm = document.getElementById('saveCertForm');
+    const mgrP12Input = document.getElementById('mgrP12Input');
+    const mgrP12Label = document.getElementById('mgrP12Label');
+    const mgrProvInput = document.getElementById('mgrProvInput');
+    const mgrProvLabel = document.getElementById('mgrProvLabel');
+    const mgrPasswordInput = document.getElementById('mgrPasswordInput');
+    const toggleMgrPasswordBtn = document.getElementById('toggleMgrPasswordBtn');
+    const newCertName = document.getElementById('newCertName');
+    const mgrSaveBtn = document.getElementById('mgrSaveBtn');
+    const deleteAllCertsBtn = document.getElementById('deleteAllCertsBtn');
+
+    // Advanced Panel Controls
     const toggleAdvanced = document.getElementById('toggleAdvanced');
     const advancedContent = document.getElementById('advancedContent');
     const advancedArrow = document.getElementById('advancedArrow');
 
-    // QR & Actions Elements
+    // QR Rendering
     const qrBtn = document.getElementById('qrBtn');
     const qrContainer = document.getElementById('qrContainer');
     const qrCanvasWrapper = document.getElementById('qrCanvasWrapper');
 
-    // Certificate Manager Elements
-    const savedCertSelect = document.getElementById('savedCertSelect');
-    const deleteCertBtn = document.getElementById('deleteCertBtn');
-    const newCertName = document.getElementById('newCertName');
-    const saveCertBtn = document.getElementById('saveCertBtn');
-    const saveCertStatus = document.getElementById('saveCertStatus');
+    // Helper: Escaping HTML values
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
 
-    // Track active file Blobs directly (allows injection of base64 loaded items)
-    let activeP12File = null;
-    let activeProvFile = null;
-    let currentInstallLink = '';
+    // ==========================================
+    // ROUTING SYSTEM (No-Refresh Native Feels)
+    // ==========================================
+    function navigateTo(path, updateState = true) {
+      const isCertificates = path.includes('/certificates');
+      const bubble = document.querySelector('.liquid-bubble');
+      const instView = document.getElementById('installer-view');
+      const certView = document.getElementById('certificates-view');
+      const instBtn = document.querySelector('[data-route="installer"]');
+      const certBtn = document.querySelector('[data-route="certificates"]');
 
-    // File Selection UX Handling (Updates Label Text dynamically)
+      if (isCertificates) {
+        instView.classList.add('hidden');
+        certView.classList.remove('hidden');
+        instBtn.classList.remove('active');
+        certBtn.classList.add('active');
+        if (bubble) bubble.style.transform = 'translateX(calc(100% + 8px))';
+        renderManagerList();
+      } else {
+        certView.classList.add('hidden');
+        instView.classList.remove('hidden');
+        certBtn.classList.remove('active');
+        instBtn.classList.add('active');
+        if (bubble) bubble.style.transform = 'translateX(0px)';
+        renderMainSavedCerts();
+      }
+
+      if (updateState && window.location.pathname !== path) {
+        history.pushState({ path: path }, '', path);
+      }
+      window.scrollTo(0, 0);
+    }
+
+    // Intercept clicks on navigation pills
+    document.querySelectorAll('.liquid-nav-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const path = item.getAttribute('href');
+        navigateTo(path);
+      });
+    });
+
+    // Handle forward/back gestures in iOS and Desktop
+    window.addEventListener('popstate', (e) => {
+      navigateTo(window.location.pathname, false);
+    });
+
+    // Handle initial state on load
+    window.addEventListener('DOMContentLoaded', () => {
+      navigateTo(window.location.pathname, false);
+    });
+
+
+    // ==========================================
+    // FILE INTERACTION LABELS (Installer & Manager)
+    // ==========================================
     p12Input.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
         activeP12File = e.target.files[0];
         p12Label.querySelector('span').innerText = activeP12File.name;
         p12Label.classList.add('file-selected');
-        // Clear saved cert dropdown since user is editing manually
-        savedCertSelect.value = "";
-        deleteCertBtn.style.display = "none";
       } else {
         activeP12File = null;
         p12Label.querySelector('span').innerText = "Choose .p12 File";
@@ -274,9 +415,6 @@
         activeProvFile = e.target.files[0];
         provLabel.querySelector('span').innerText = activeProvFile.name;
         provLabel.classList.add('file-selected');
-        // Clear saved cert dropdown since user is editing manually
-        savedCertSelect.value = "";
-        deleteCertBtn.style.display = "none";
       } else {
         activeProvFile = null;
         provLabel.querySelector('span').innerText = "Choose .mobileprovision File";
@@ -284,30 +422,47 @@
       }
     });
 
-    // Password Visibility Toggle Logic
+    mgrP12Input.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        managerActiveP12 = e.target.files[0];
+        mgrP12Label.querySelector('span').innerText = managerActiveP12.name;
+        mgrP12Label.classList.add('file-selected');
+      } else {
+        managerActiveP12 = null;
+        mgrP12Label.querySelector('span').innerText = "Choose .p12 File";
+        mgrP12Label.classList.remove('file-selected');
+      }
+    });
+
+    mgrProvInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        managerActiveProv = e.target.files[0];
+        mgrProvLabel.querySelector('span').innerText = managerActiveProv.name;
+        mgrProvLabel.classList.add('file-selected');
+      } else {
+        managerActiveProv = null;
+        mgrProvLabel.querySelector('span').innerText = "Choose .mobileprovision File";
+        mgrProvLabel.classList.remove('file-selected');
+      }
+    });
+
+    // Password view togglers
     togglePasswordBtn.addEventListener('click', () => {
       const isPassword = passwordInput.getAttribute('type') === 'password';
       passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
       togglePasswordBtn.innerText = isPassword ? 'Hide' : 'Show';
     });
 
-    // Advanced Section Accordion Logic
-    toggleAdvanced.addEventListener('click', () => {
-      const isHidden = advancedContent.classList.contains('hidden');
-      if (isHidden) {
-        advancedContent.classList.remove('hidden');
-        advancedArrow.style.transform = 'rotate(180deg)';
-      } else {
-        advancedContent.classList.add('hidden');
-        advancedArrow.style.transform = 'rotate(0deg)';
-      }
+    toggleMgrPasswordBtn.addEventListener('click', () => {
+      const isPassword = mgrPasswordInput.getAttribute('type') === 'password';
+      mgrPasswordInput.setAttribute('type', isPassword ? 'text' : 'password');
+      toggleMgrPasswordBtn.innerText = isPassword ? 'Hide' : 'Show';
     });
 
-    // ==========================================
-    // PERSISTENT STORAGE CERTIFICATE ENGINE
-    // ==========================================
 
-    // Helper: File to Base64 String
+    // ==========================================
+    // PERSISTENT STORAGE ENGINE (Local Database)
+    // ==========================================
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -317,7 +472,6 @@
       });
     }
 
-    // Helper: Base64 String back to File Object
     function base64ToFile(dataUrl, filename) {
       const arr = dataUrl.split(',');
       const mime = arr[0].match(/:(.*?);/)[1];
@@ -330,13 +484,12 @@
       return new File([u8arr], filename, { type: mime });
     }
 
-    // Storage access
     function getSavedCerts() {
       try {
         const data = localStorage.getItem("purple_installer_certs");
         return data ? JSON.parse(data) : [];
       } catch (e) {
-        console.error("Failed to parse saved certificates from localStorage", e);
+        console.error("Local storage error:", e);
         return [];
       }
     }
@@ -345,162 +498,224 @@
       localStorage.setItem("purple_installer_certs", JSON.stringify(list));
     }
 
-    // Render Saved Certificates in Dropdown
-    function renderSavedCertsDropdown() {
-      const certs = getSavedCerts();
-      const currentSelection = savedCertSelect.value;
-      
-      savedCertSelect.innerHTML = '<option value="">-- Select a saved certificate --</option>';
-      certs.forEach(cert => {
-        const opt = document.createElement('option');
-        opt.value = cert.id;
-        opt.textContent = cert.name;
-        savedCertSelect.appendChild(opt);
+
+    // ==========================================
+    // CERTIFICATES SELECTION & CARDS (Main view)
+    // ==========================================
+    const tabBtns = document.querySelectorAll('.cert-tab-btn');
+    const uploadFields = document.getElementById('uploadCertFields');
+    const savedFields = document.getElementById('savedCertFields');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const target = btn.dataset.source;
+        if (target === 'upload') {
+          uploadFields.classList.remove('hidden');
+          savedFields.classList.add('hidden');
+          
+          // Fall back active targets to local uploaded file items
+          if (p12Input.files.length > 0) activeP12File = p12Input.files[0];
+          else activeP12File = null;
+
+          if (provInput.files.length > 0) activeProvFile = provInput.files[0];
+          else activeProvFile = null;
+        } else {
+          uploadFields.classList.add('hidden');
+          savedFields.classList.remove('hidden');
+          renderMainSavedCerts();
+        }
       });
+    });
 
-      if (certs.some(c => c.id === currentSelection)) {
-        savedCertSelect.value = currentSelection;
-        deleteCertBtn.style.display = "block";
-      } else {
-        savedCertSelect.value = "";
-        deleteCertBtn.style.display = "none";
-      }
-    }
-
-    // Save active Certificate elements to LocalStorage
-    saveCertBtn.addEventListener('click', async () => {
-      const name = newCertName.value.trim();
-      if (!name) {
-        alert("Please enter a name for the saved certificate.");
+    function renderMainSavedCerts() {
+      const certs = getSavedCerts();
+      const container = document.getElementById('savedCertsGrid');
+      
+      if (certs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-certs-container">
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">You don't have any saved certificates yet.</p>
+            <button type="button" class="btn" style="min-height: 38px; font-size: 0.8rem; width: auto; margin: 0 auto; display: inline-flex; padding: 0.5rem 1rem;" onclick="navigateTo('/Purple-Installer/certificates/')">
+              Go to Certificates Page
+            </button>
+          </div>
+        `;
         return;
       }
 
-      if (!activeP12File || !activeProvFile) {
-        alert("Please upload or select both a .p12 and a .mobileprovision profile first to save.");
+      container.innerHTML = '';
+      certs.forEach(cert => {
+        const isSelected = selectedCertId === cert.id;
+        const box = document.createElement('div');
+        box.className = `cert-box ${isSelected ? 'selected' : ''}`;
+        box.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="cert-box-title">${escapeHtml(cert.name)}</span>
+            <span class="cert-indicator" style="${isSelected ? 'background: var(--accent);' : 'background: transparent;'}"></span>
+          </div>
+          <div class="cert-box-details">
+            📁 ${escapeHtml(cert.p12Name)}<br>
+            📄 ${escapeHtml(cert.provName)}
+          </div>
+        `;
+        
+        box.addEventListener('click', () => {
+          selectedCertId = cert.id;
+          activeP12File = base64ToFile(cert.p12Data, cert.p12Name);
+          activeProvFile = base64ToFile(cert.provData, cert.provName);
+          passwordInput.value = cert.password || "";
+          renderMainSavedCerts();
+        });
+
+        container.appendChild(box);
+      });
+    }
+
+
+    // ==========================================
+    // MANAGING LISTS & INPUTS (Certificates view)
+    // ==========================================
+    saveCertForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = newCertName.value.trim();
+      if (!name) return;
+
+      if (!managerActiveP12 || !managerActiveProv) {
+        alert("Please upload both a Valid Certificate and a Provisioning Profile to save.");
         return;
       }
 
       try {
-        saveCertBtn.disabled = true;
-        saveCertBtn.innerText = "Saving...";
+        mgrSaveBtn.disabled = true;
+        mgrSaveBtn.innerText = "Encoding files...";
 
-        const p12Base64 = await fileToBase64(activeP12File);
-        const provBase64 = await fileToBase64(activeProvFile);
-        const password = passwordInput.value;
+        const p12Base64 = await fileToBase64(managerActiveP12);
+        const provBase64 = await fileToBase64(managerActiveProv);
+        const password = mgrPasswordInput.value;
 
-        const newCertObj = {
+        const newCert = {
           id: Date.now().toString(),
           name: name,
           p12Data: p12Base64,
-          p12Name: activeP12File.name,
+          p12Name: managerActiveP12.name,
           provData: provBase64,
-          provName: activeProvFile.name,
+          provName: managerActiveProv.name,
           password: password
         };
 
-        const certs = getSavedCerts();
-        certs.push(newCertObj);
-        saveCertsList(certs);
+        const list = getSavedCerts();
+        list.push(newCert);
+        saveCertsList(list);
 
-        renderSavedCertsDropdown();
-        savedCertSelect.value = newCertObj.id;
-        deleteCertBtn.style.display = "block";
-        newCertName.value = "";
+        // Reset fields
+        newCertName.value = '';
+        mgrP12Input.value = '';
+        mgrProvInput.value = '';
+        mgrPasswordInput.value = '';
+        managerActiveP12 = null;
+        managerActiveProv = null;
+        mgrP12Label.querySelector('span').innerText = "Choose .p12 File";
+        mgrP12Label.classList.remove('file-selected');
+        mgrProvLabel.querySelector('span').innerText = "Choose .mobileprovision File";
+        mgrProvLabel.classList.remove('file-selected');
 
-        saveCertStatus.innerText = `✓ Saved "${name}" successfully!`;
-        saveCertStatus.classList.remove('hidden');
-        setTimeout(() => saveCertStatus.classList.add('hidden'), 3000);
+        renderManagerList();
+        alert("Certificate successfully stored in local cache!");
 
       } catch (err) {
         console.error(err);
-        alert("Failed to save certificate: " + err.message);
+        alert("Saving error: " + err.message);
       } finally {
-        saveCertBtn.disabled = false;
-        saveCertBtn.innerText = "Save";
+        mgrSaveBtn.disabled = false;
+        mgrSaveBtn.innerText = "Save Secure Certificate";
       }
     });
 
-    // Handle Certificate Dropdown Selection
-    savedCertSelect.addEventListener('change', () => {
-      const selectedId = savedCertSelect.value;
-      if (!selectedId) {
-        deleteCertBtn.style.display = "none";
+    function renderManagerList() {
+      const certs = getSavedCerts();
+      const container = document.getElementById('mgrCertsGrid');
+
+      if (certs.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 2rem; border: 2px dashed var(--border); border-radius: 8px; color: var(--text-muted); font-size: 0.9rem;">
+            No stored credentials found in local storage. Create one above.
+          </div>
+        `;
+        deleteAllCertsBtn.style.display = 'none';
         return;
       }
 
-      deleteCertBtn.style.display = "block";
-      const certs = getSavedCerts();
-      const cert = certs.find(c => c.id === selectedId);
-      if (cert) {
-        // Convert stored base64 strings back into File elements
-        activeP12File = base64ToFile(cert.p12Data, cert.p12Name);
-        activeProvFile = base64ToFile(cert.provData, cert.provName);
-        passwordInput.value = cert.password || "";
+      deleteAllCertsBtn.style.display = 'inline-block';
+      container.innerHTML = '';
+      
+      certs.forEach(cert => {
+        const box = document.createElement('div');
+        box.className = 'cert-box';
+        box.style.cursor = 'default';
+        box.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="cert-box-title" style="color: var(--accent-text);">${escapeHtml(cert.name)}</span>
+            <button class="mgr-delete-individual" style="background: transparent; border: 0; color: var(--error); cursor: pointer; font-size: 0.75rem; font-weight: 700;">
+              Delete
+            </button>
+          </div>
+          <div class="cert-box-details" style="margin-top: 0.4rem;">
+            🔑 P12 File: ${escapeHtml(cert.p12Name)}<br>
+            📄 Provision: ${escapeHtml(cert.provName)}<br>
+            🔒 Password Saved: ${cert.password ? "••••••••" : "None"}
+          </div>
+        `;
 
-        // Update CSS classes & layout indicators visually
-        p12Label.querySelector('span').innerText = `${cert.p12Name} (Saved)`;
-        p12Label.classList.add('file-selected');
-        provLabel.querySelector('span').innerText = `${cert.provName} (Saved)`;
-        provLabel.classList.add('file-selected');
+        box.querySelector('.mgr-delete-individual').addEventListener('click', () => {
+          if (confirm(`Are you sure you want to delete the certificate "${cert.name}"?`)) {
+            const list = getSavedCerts();
+            const filtered = list.filter(c => c.id !== cert.id);
+            saveCertsList(filtered);
+            if (selectedCertId === cert.id) {
+              selectedCertId = null;
+              activeP12File = null;
+              activeProvFile = null;
+            }
+            renderManagerList();
+          }
+        });
 
-        // Clear native DOM file queues
-        p12Input.value = "";
-        provInput.value = "";
-      }
-    });
+        container.appendChild(box);
+      });
+    }
 
-    // Delete a Saved Certificate
-    deleteCertBtn.addEventListener('click', () => {
-      const selectedId = savedCertSelect.value;
-      if (!selectedId) return;
-
-      const certs = getSavedCerts();
-      const certToDelete = certs.find(c => c.id === selectedId);
-      if (!certToDelete) return;
-
-      if (confirm(`Are you sure you want to delete "${certToDelete.name}"?`)) {
-        const updated = certs.filter(c => c.id !== selectedId);
-        saveCertsList(updated);
-        renderSavedCertsDropdown();
-
-        // Reset inputs & states
+    deleteAllCertsBtn.addEventListener('click', () => {
+      const confirmation = confirm("⚠️ Are you absolutely sure? This action will completely and permanently wipe all saved credentials from your device's browser cache.");
+      if (confirmation) {
+        localStorage.removeItem("purple_installer_certs");
+        selectedCertId = null;
         activeP12File = null;
         activeProvFile = null;
-        p12Input.value = "";
-        provInput.value = "";
-        p12Label.querySelector('span').innerText = "Choose .p12 File";
-        p12Label.classList.remove('file-selected');
-        provLabel.querySelector('span').innerText = "Choose .mobileprovision File";
-        provLabel.classList.remove('file-selected');
-        passwordInput.value = "";
+        renderManagerList();
       }
     });
 
-    // Initialize versions for default selection (Feather) on load
-    updateVersions(appSelect.value);
-    // Render the certificates on page load
-    renderSavedCertsDropdown();
 
     // ==========================================
-
-    // Populate Version Dropdown & Default to the true "Latest Stable" Release
+    // BACKEND HANDLERS (Daisign APIs Engine)
+    // ==========================================
     async function updateVersions(appKey) {
       versionSelect.disabled = true;
       versionSelect.innerHTML = '<option value="">Loading versions...</option>';
       
       const config = APP_CONFIG[appKey];
       try {
-        // Query parameter per_page=100 ensures we pull in complete version lists past the default API cutoff
         const response = await fetch(`https://api.github.com/repos/${config.repo}/releases?per_page=100`);
-        if (!response.ok) {
-          throw new Error(`GitHub returned status code ${response.status}`);
-        }
-        const releases = await response.json();
+        if (!response.ok) throw new Error(`GitHub returned status code ${response.status}`);
         
+        const releases = await response.json();
         versionSelect.innerHTML = '';
         let matchCount = 0;
 
-        // Step 1: Query the array to find the first genuine (non-prerelease) with the asset
         let defaultStableUrl = null;
         for (const release of releases) {
           if (!release.prerelease) {
@@ -514,7 +729,6 @@
           }
         }
 
-        // Fallback: If absolutely everything is flagged as a prerelease, use the absolute first asset found
         if (!defaultStableUrl) {
           for (const release of releases) {
             const ipaAsset = release.assets.find(
@@ -527,7 +741,6 @@
           }
         }
 
-        // Step 2: Build the dropdown items
         releases.forEach((release) => {
           const ipaAsset = release.assets.find(
             asset => asset.name.toLowerCase() === config.fileName.toLowerCase()
@@ -536,15 +749,10 @@
           if (ipaAsset) {
             const option = document.createElement('option');
             option.value = ipaAsset.browser_download_url;
-            
             let releaseName = release.name || release.tag_name;
             
-            // Append Beta/Pre-release tags visually so the user has context
-            if (release.prerelease) {
-              releaseName += " (Beta)";
-            }
+            if (release.prerelease) releaseName += " (Beta)";
 
-            // Set dynamic selection and highlight status
             if (ipaAsset.browser_download_url === defaultStableUrl) {
               option.selected = true;
               option.textContent = `${releaseName} (Latest Stable)`;
@@ -558,7 +766,7 @@
         });
 
         if (matchCount === 0) {
-          versionSelect.innerHTML = `<option value="">No ${config.fileName} asset found in any release</option>`;
+          versionSelect.innerHTML = `<option value="">No ${config.fileName} asset found</option>`;
         } else {
           versionSelect.disabled = false;
         }
@@ -568,12 +776,21 @@
       }
     }
 
-    // Event Listener to switch version lists when active app changes
     appSelect.addEventListener('change', (e) => {
       updateVersions(e.target.value);
     });
 
-    // Copy Link Helper
+    toggleAdvanced.addEventListener('click', () => {
+      const isHidden = advancedContent.classList.contains('hidden');
+      if (isHidden) {
+        advancedContent.classList.remove('hidden');
+        advancedArrow.style.transform = 'rotate(180deg)';
+      } else {
+        advancedContent.classList.add('hidden');
+        advancedArrow.style.transform = 'rotate(0deg)';
+      }
+    });
+
     const copyBtn = document.getElementById('copyBtn');
     copyBtn.addEventListener('click', async () => {
       if (!currentInstallLink) return;
@@ -592,33 +809,23 @@
       }
     });
 
-    // Dynamic, Client-Side QR Code Engine Generation
     qrBtn.addEventListener('click', () => {
       if (!currentInstallLink) return;
-      
       const isHidden = qrContainer.classList.contains('hidden');
       if (isHidden) {
-        // Clear out any old canvas
         qrCanvasWrapper.innerHTML = '';
-
-        // Create a native canvas element
         const canvas = document.createElement('canvas');
 
-        // Draw the QR Code client-side
         QRCode.toCanvas(canvas, currentInstallLink, {
             width: 150,       
             margin: 1,        
-            color: {
-                dark: '#07090d',  
-                light: '#ffffff'  
-            }
+            color: { dark: '#07090d', light: '#ffffff' }
         }, function (error) {
             if (error) {
                 console.error(error);
-                qrCanvasWrapper.innerHTML = '<span style="font-size: 0.75rem; color: var(--error)">❌ Failed to render QR Code</span>';
+                qrCanvasWrapper.innerHTML = '<span style="font-size: 0.75rem; color: var(--error)">❌ Render Failed</span>';
                 return;
             }
-            // Append the fully calculated canvas directly to the container
             qrCanvasWrapper.appendChild(canvas);
         });
 
@@ -634,11 +841,9 @@
       }
     });
 
-    // Sign Application Submit Logic
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Clear structural layouts
       statusArea.classList.add('hidden');
       statusArea.style.borderColor = '';
       statusArea.style.color = '';
@@ -649,17 +854,15 @@
       qrBtn.style.borderColor = "";
       submitBtn.disabled = true;
 
-      // Show custom progress container
       progressContainer.classList.remove('hidden');
       progressStatus.innerText = "Sourcing release metadata...";
 
-      // Manual validations replacing original file input 'required' restrictions
       if (!activeP12File) {
         progressContainer.classList.add('hidden');
         statusArea.classList.remove('hidden');
         statusArea.style.borderColor = 'var(--error)';
         statusArea.style.color = 'var(--error)';
-        statusArea.innerText = "Error: Please upload or select a saved certificate (.p12).";
+        statusArea.innerText = "Error: Please upload or select a certificate (.p12) before signing.";
         submitBtn.disabled = false;
         return;
       }
@@ -669,7 +872,7 @@
         statusArea.classList.remove('hidden');
         statusArea.style.borderColor = 'var(--error)';
         statusArea.style.color = 'var(--error)';
-        statusArea.innerText = "Error: Please upload or select a saved provisioning profile (.mobileprovision).";
+        statusArea.innerText = "Error: Please upload or select a provisioning profile (.mobileprovision).";
         submitBtn.disabled = false;
         return;
       }
@@ -678,7 +881,6 @@
       const provFile = activeProvFile;
       const password = passwordInput.value;
       const permInstallChecked = document.getElementById('permInstallToggle').checked;
-
       const appKey = appSelect.value;
       const appConfig = APP_CONFIG[appKey];
       const selectedIpaUrl = versionSelect.value;
@@ -704,35 +906,18 @@
         formData.append("cyan_fakesign", "on");
       }
 
-      // Route the direct GitHub download URL directly to Daisign's backend API
       formData.append("ipaUrls", JSON.stringify([selectedIpaUrl]));
-
       progressStatus.innerText = `Deploying data for ${appConfig.name} to Daisign...`;
 
-      // Build precise modifications object based on active file requirements
       const modifications = {
         [filename]: {
-          "appName": "",
-          "version": "",
-          "bundleId": "",
-          "minOsVersion": "",
-          "removeUiDevices": false,
-          "removeWatchApps": false,
-          "enableDocumentSupport": false,
-          "thinToArm64": false,
-          "removeExtensions": false,
-          "ignoreEncryption": false,
-          "removeEmbeddedProvision": false,
-          "injectAdblock": false,
-          "injectSideloadFix": false,
-          "removeUrlSchemes": false,
-          "randomizeBundleId": false,
-          "enableFileSharing": false,
-          "enableProMotion": false,
-          "enableGameMode": false,
-          "isFakesign": false,
-          "hasPermIcon": false, 
-          "hasPermTweaks": false
+          "appName": "", "version": "", "bundleId": "", "minOsVersion": "",
+          "removeUiDevices": false, "removeWatchApps": false, "enableDocumentSupport": false,
+          "thinToArm64": false, "removeExtensions": false, "ignoreEncryption": false,
+          "removeEmbeddedProvision": false, "injectAdblock": false, "injectSideloadFix": false,
+          "removeUrlSchemes": false, "randomizeBundleId": false, "enableFileSharing": false,
+          "enableProMotion": false, "enableGameMode": false, "isFakesign": false,
+          "hasPermIcon": false, "hasPermTweaks": false
         }
       };
       
@@ -744,22 +929,17 @@
           body: formData
         });
 
-        if (!response.ok) {
-          throw new Error(`Server error: status code ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Server error: status code ${response.status}`);
 
         const data = await response.json();
 
         if (data.successes && data.successes.length > 0) {
           progressContainer.classList.add('hidden');
-          
           const app = data.successes[0];
           document.getElementById('appNameDisplay').innerText = `App Name: ${app.displayName}`;
           document.getElementById('downloadBtn').href = app.signedIpaUrl;
           document.getElementById('installBtn').href = app.installLink;
-          
           currentInstallLink = app.installLink;
-          
           resultBox.classList.remove('hidden');
         } else {
           const failureMsg = data.failures && data.failures.length > 0 
@@ -779,6 +959,9 @@
         submitBtn.disabled = false;
       }
     });
+
+    // Populate versions on setup
+    updateVersions(appSelect.value);
   </script>
 </body>
 </html>
