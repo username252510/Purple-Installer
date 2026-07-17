@@ -368,6 +368,85 @@ input:checked + .slider:before {
 }
 
 /* ==========================================================================
+   DYNAMIC APP SELECTION CARDS & DESCRIPTIONS
+   ========================================================================== */
+.app-desc-container {
+  display: flex;
+  gap: 1rem;
+  background: #11151f;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1.15rem;
+  margin-top: 1rem;
+  align-items: flex-start;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.app-desc-container:hover {
+  border-color: rgba(109, 40, 217, 0.4);
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.app-desc-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 22%; /* Perfect iOS Apple Squircle Approximation */
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.app-desc-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.app-desc-title {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.02em;
+}
+
+/* SideInstaller Wireless iOS Warning Flag */
+.app-warning-box {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  animation: pulseWarning 2s infinite ease-in-out;
+}
+
+@keyframes pulseWarning {
+  0%, 100% { border-color: rgba(239, 68, 68, 0.35); }
+  50% { border-color: rgba(239, 68, 68, 0.6); }
+}
+
+/* Success View Customizations */
+#success-view {
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
    PROGRESS LOADING ARCHITECTURE
    ========================================================================== */
 .progress-container {
