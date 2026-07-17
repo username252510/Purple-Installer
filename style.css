@@ -1,440 +1,194 @@
 /* ==========================================================================
-   THEME VARIABLES & COLOR UTILITIES (Unified Cyber Purple)
-   ========================================================================== */
-:root {
-  --bg: #07090d;
-  --card: #0c0f15;
-  --text: #dde4f0;
-  --text-muted: #4e6070;
-  --border: #161c27;
-  --nav-bg: rgba(12, 15, 21, 0.85);
-
-  /* Deep Royal Purple Theme Core */
-  --accent: #6d28d9;
-  --accent-glow: rgba(109, 40, 217, 0.35);
-  --accent-text: #a78bfa;
-
-  /* Sideload Feedback States */
-  --success: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.15);
-  --error: #ef4444;
-  --error-glow: rgba(239, 68, 68, 0.15);
-}
-
-/* ==========================================================================
-   BASE RESETS & MOBILE CORE
-   ========================================================================== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  overflow-x: hidden;
-  -webkit-text-size-adjust: 100%; /* Prevents iOS auto-resizing text */
-  -webkit-tap-highlight-color: transparent; /* Removes ugly flash on mobile touch */
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Oxanium', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  min-height: 100vh;
-  line-height: 1.5;
-}
-
-/* Technological background grid - updated with purple ambient accent mapping */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(109, 40, 217, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(109, 40, 217, 0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* ==========================================================================
-   LAYOUT CONTAINER
+   UPDATED CONTAINER OFFSET (Saves Space for Fixed Navigation)
    ========================================================================== */
 .container {
   position: relative;
   z-index: 1;
-  max-width: 600px; /* Optimized structure for narrow phone configurations */
+  max-width: 600px;
   width: 100%;
-  padding: 1.5rem 1rem 3rem;
+  padding: 1.5rem 1rem 120px; /* High bottom padding to ensure navbar never covers inputs */
   margin: auto;
 }
 
 /* ==========================================================================
-   NAVBAR (Mobile Responsive Architecture)
+   BROWSER TAB ENGINE (Segmented Control Layouts)
    ========================================================================== */
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+.cert-tab-selector {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: var(--nav-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 2px solid var(--accent);
-}
-
-.nav-left {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto; /* Allow side scrolling for nav items if needed on tiny screens */
-  -webkit-overflow-scrolling: touch;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  padding: 0.5rem 0.8rem;
-  border-radius: 6px;
-  border: 2px solid transparent;
-  white-space: nowrap;
-  transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.nav-link:hover, .nav-link.active {
-  color: var(--accent-text);
-  border-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-}
-
-/* ==========================================================================
-   TYPOGRAPHY
-   ========================================================================== */
-h1 {
-  font-size: clamp(1.75rem, 5vw, 2.5rem); /* Scaled down slightly for PC screens */
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  text-align: center;
-  background: linear-gradient(135deg, #c084fc 0%, #a78bfa 50%, #818cf8 100%); /* Purple/Violet/Indigo Gradient */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
-}
-
-.tagline {
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 2rem;
-}
-
-/* ==========================================================================
-   SIGNER FORMS & INPUT CONTROLS (Touch Screen Optimized)
-   ========================================================================== */
-.form-group {
-  margin-bottom: 1.25rem;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 0.5rem;
-  text-align: left;
-}
-
-/* Unified Web Selectors and Password Inputs */
-input[type="password"], 
-input[type="text"], 
-select {
-  width: 100%;
-  min-height: 46px; /* Optimized Apple Touch Target Standard */
-  padding: 0.75rem 1rem;
   background: #11151f;
-  border: 2px solid var(--border);
-  color: var(--text);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  outline: none;
-  -webkit-appearance: none; /* Strips native iOS safari inner rendering anomalies */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-select {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234e6070' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-  padding-right: 2.5rem;
-}
-
-input:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 12px var(--accent-glow);
-}
-
-/* Clean Custom Styled Invisible File Upload Setup */
-.hidden-file-input {
-  display: none !important;
-}
-
-.file-upload-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 46px;
-  padding: 0.75rem 1rem;
-  background: #11151f;
-  border: 2px dashed var(--border);
-  color: var(--text-muted);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.file-upload-label:hover {
-  border-color: var(--accent);
-  color: var(--text);
-  background: rgba(109, 40, 217, 0.05);
-  box-shadow: 0 0 12px var(--accent-glow);
-}
-
-/* Change style when file is selected */
-.file-upload-label.file-selected {
-  border-style: solid;
-  border-color: var(--accent);
-  color: var(--accent-text);
-  font-weight: 600;
-  background: rgba(109, 40, 217, 0.08);
-}
-
-/* Toggle Switch Styling */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 48px;
-  height: 26px;
-  flex-shrink: 0;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #11151f;
-  border: 2px solid var(--border);
-  transition: .3s;
-  border-radius: 34px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--text-muted);
-  transition: .3s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-}
-
-input:checked + .slider:before {
-  transform: translateX(22px);
-  background-color: #ffffff;
-}
-
-/* Password View-Toggle Design */
-.password-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.password-wrapper input {
-  padding-right: 4.5rem;
-}
-
-.password-toggle-btn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  color: var(--accent-text);
-  font-family: inherit;
-  font-weight: 700;
-  font-size: 0.8rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: color 0.2s ease;
-}
-
-.password-toggle-btn:hover {
-  color: #ffffff;
-}
-
-/* ==========================================================================
-   BUTTONS
-   ========================================================================== */
-.btn {
-  width: 100%; /* Full span on mobile views ensures comfortable interaction */
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border: 2px solid var(--accent);
-  color: #ffffff;
-  background: var(--accent);
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.2);
-  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), 
-              background-color 0.2s ease, 
-              box-shadow 0.2s ease, 
-              border-color 0.2s ease;
-}
-
-.btn:hover, .btn:active {
-  background: transparent;
-  color: var(--accent-text);
-  box-shadow: 0 0 18px var(--accent-glow);
-}
-
-/* Active touch feedback compression for phones */
-.btn:active {
-  transform: scale(0.98);
-}
-
-/* ==========================================================================
-   CONTENT CARDS & SYSTEM STATE TILES
-   ========================================================================== */
-.about-box, .custom-card, .store-card, .status-box {
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  text-align: left;
-  margin-top: 1.5rem;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-}
-
-.about-box h2, .custom-card h2 {
-  color: var(--accent-text);
-  font-size: 1.2rem;
-  margin-bottom: 0.75rem;
-  font-weight: 700;
-}
-
-.about-box p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-/* Fluid Hover Integration across interaction targets */
-.about-box:hover, .custom-card:hover, .store-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 16px var(--accent-glow);
-}
-
-/* ==========================================================================
-   PROGRESS LOADING ARCHITECTURE
-   ========================================================================== */
-.progress-container {
-  margin-top: 1.5rem;
-  background: #0f131c;
   border: 2px solid var(--border);
   border-radius: 10px;
-  padding: 1rem;
+  padding: 4px;
+  margin-bottom: 1rem;
 }
 
-.progress-bar-bg {
-  width: 100%;
-  background: var(--bg);
-  height: 8px;
-  border-radius: 999px;
-  overflow: hidden;
+.cert-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.65rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.cert-tab-btn:hover {
+  color: var(--text);
+}
+
+.cert-tab-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* ==========================================================================
+   SAVED CERTIFICATE GRID & SELECTION TILES (Aesthetic Boxes)
+   ========================================================================== */
+.cert-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
-.progress-bar-fill {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-text));
-  border-radius: 999px;
+/* Match layout on wider viewports like tablets or PC screens */
+@media (min-width: 480px) {
+  .cert-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
-.animate-pulse {
-  animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.cert-box {
+  background: #11151f;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .4; }
+.cert-box:hover {
+  border-color: rgba(109, 40, 217, 0.45);
+}
+
+.cert-box.selected {
+  border-color: var(--accent);
+  background: rgba(109, 40, 217, 0.08);
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.cert-box-title {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.cert-box-details {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  font-family: monospace;
+}
+
+.cert-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 2px solid var(--accent);
+  transition: background-color 0.2s ease;
+}
+
+.empty-certs-container {
+  text-align: center;
+  padding: 1.75rem 1rem;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  background: #0f131c;
 }
 
 /* ==========================================================================
-   CLIENT SIDE RENDERING CONTROLLERS (QR Blocks & Success Panels)
+   APPLE LIQUID GLASS BOTTOM NAVIGATION BAR
    ========================================================================== */
-.success-card {
-  border-color: rgba(16, 185, 129, 0.4);
-  background: linear-gradient(to bottom, var(--card), rgba(16, 185, 129, 0.02));
+.liquid-nav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background: rgba(12, 15, 21, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 40px;
+  padding: 6px;
+  gap: 8px;
+  z-index: 1000;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6),
+              inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  width: 250px; /* Structured physical scale constraint */
 }
 
-.qr-wrapper {
-  margin-top: 1rem;
-  background: #ffffff;
-  padding: 0.75rem;
-  border-radius: 10px;
-  display: inline-block;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+.liquid-nav-item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 700;
+  border-radius: 35px;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  z-index: 2;
+  gap: 2px;
 }
 
-/* Global Hidden Visibility Controller */
-.hidden {
-  display: none !important;
+.liquid-nav-icon {
+  font-size: 1.15rem;
 }
 
-/* Responsive Grid Engine adjustments for iPads/Tablets */
-@media (min-width: 640px) {
-  .container {
-    padding: 3rem 2rem;
-  }
-  .about-box, .custom-card {
-    padding: 2rem;
-  }
-  .btn {
-    width: auto;
-    display: inline-flex;
-  }
+.liquid-nav-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.liquid-nav-item.active {
+  color: #ffffff;
+}
+
+/* 3D Liquid Bubble Overlay (Directly references the wet 3D highlight of home icon) */
+.liquid-bubble {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: calc(50% - 10px); /* Split evenly minus localized gap allocations */
+  height: 52px;
+  border-radius: 35px;
+  
+  /* Dual physical refraction: bright light ring at upper apex + dynamic depth shading */
+  background: radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 60%),
+              linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.4) 100%);
+              
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6),    /* High intense lip shine */
+              inset 0 -3px 6px rgba(0, 0, 0, 0.55),         /* Soft dense base refraction shadows */
+              inset 0 8px 18px rgba(255, 255, 255, 0.25),   /* Middle-body volume light */
+              0 8px 24px rgba(109, 40, 217, 0.55);          /* Underlying reactive purple neon cast */
+              
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  transition: transform 0.4s cubic-bezier(0.25, 1.15, 0.4, 1);
+  pointer-events: none;
+  z-index: 1;
 }
