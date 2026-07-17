@@ -35,6 +35,9 @@
             <option value="ksign">Ksign</option>
             <option value="sideinstaller">SideInstaller</option>
           </select>
+          
+          <!-- Dynamic App Description Container -->
+          <div id="appDescriptionContainer" class="app-desc-container hidden"></div>
         </div>
 
         <!-- 2. VERSION SELECTOR -->
@@ -141,41 +144,6 @@
 
       <!-- Status / Error Indicator -->
       <div id="statusArea" class="status-box hidden"></div>
-
-      <!-- Success Result Box -->
-      <div id="resultBox" class="success-card custom-card hidden" style="margin-top: 1.5rem;">
-        <h3 style="color: var(--success); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-          ✓ App Signed Successfully!
-        </h3>
-        <div style="font-size: 0.9rem; text-align: left;">
-          <p style="color: var(--text); font-weight: 600; margin-bottom: 1rem;" id="appNameDisplay"></p>
-          
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <a id="installBtn" href="#" class="btn" style="background: var(--success); border-color: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
-              Direct Install on iOS
-            </a>
-            
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
-              <button id="copyBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
-                Copy Link
-              </button>
-              
-              <button id="qrBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
-                Show QR Code
-              </button>
-
-              <a id="downloadBtn" href="#" target="_blank" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem; background: #1f2937; border-color: #374151; box-shadow: none;">
-                Download IPA
-              </a>
-            </div>
-          </div>
-
-          <div id="qrContainer" class="hidden" style="margin-top: 1.25rem; padding: 1rem; background: #0f131c; border: 2px solid var(--border); border-radius: 8px; text-align: center;">
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600;">Scan with your iOS Camera to install directly</p>
-            <div id="qrCanvasWrapper" class="qr-wrapper"></div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -244,6 +212,59 @@
 
 
   <!-- ==========================================
+       VIEW 3: SUCCESS INSTALLATION VIEW (Internal Routing)
+       ========================================== -->
+  <div id="success-view" class="container hidden">
+    <div class="success-card custom-card">
+      <h1 style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem;">
+        App Signed!
+      </h1>
+      <p class="tagline">Your customized payload is ready for deployment</p>
+
+      <!-- Clean Center Layout for App Icon and Metadata -->
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 2rem 0; gap: 1rem;">
+        <img id="successAppIcon" src="" alt="App Icon" class="app-desc-icon" style="width: 96px; height: 96px; border-radius: 22%; box-shadow: 0 10px 30px rgba(109, 40, 217, 0.4); border: 2px solid rgba(255, 255, 255, 0.15);">
+        <h2 id="successAppName" style="color: #ffffff; font-size: 1.4rem; font-weight: 800; tracking-wide: -0.01em;">App Name</h2>
+      </div>
+
+      <!-- Action Installation Controls -->
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <a id="successInstallBtn" href="#" class="btn" style="background: var(--success); border-color: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+          Direct Install on iOS
+        </a>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+          <button id="successCopyBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
+            Copy Link
+          </button>
+          
+          <button id="successQrBtn" type="button" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem;">
+            Show QR Code
+          </button>
+
+          <a id="successDownloadBtn" href="#" target="_blank" class="btn" style="min-height: 40px; font-size: 0.75rem; padding: 0.5rem 0.25rem; background: #1f2937; border-color: #374151; box-shadow: none;">
+            Download IPA
+          </a>
+        </div>
+      </div>
+
+      <!-- QR Code Output Area -->
+      <div id="successQrContainer" class="hidden" style="margin-top: 1.25rem; padding: 1.25rem; background: #0f131c; border: 2px solid var(--border); border-radius: 10px; text-align: center;">
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600;">Scan with your iOS Camera to install directly</p>
+        <div id="successQrCanvasWrapper" class="qr-wrapper"></div>
+      </div>
+
+      <hr style="border: 0; border-top: 2px solid var(--border); margin: 1.75rem 0 1.25rem;">
+
+      <!-- Cleared Reset System Interaction Button -->
+      <button id="resetBtn" class="btn" style="background: transparent; border-color: var(--border); color: var(--text-muted); box-shadow: none; font-weight: 600;">
+        Install Another App
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
        APPLE LIQUID GLASS BOTTOM NAVIGATION
        ========================================== -->
   <div class="liquid-nav">
@@ -284,8 +305,27 @@
       }
     };
 
+    // App Descriptions and Asset Permalinks (configured as query-renderable raw assets)
+    const APP_DESCRIPTIONS = {
+      feather: {
+        desc: "A clean, open-source app signer for your iPhone or iPad. It lets you sideload IPAs quickly and safely using your own certificates. It is completely ad-free and comes with handy extras like tweak injection and custom bundle IDs.",
+        icon: "https://github.com/username252510/Purple-Installer/blob/e5a8c1c36eb0f17b8ef40c29dcea49c1077be188/images/FeatherLogo.jpg?raw=true",
+        warning: ""
+      },
+      ksign: {
+        desc: "Built directly on top of Feather, Ksign takes that same great foundation and packs in extra features. It gives you a more modern UI and advanced file-management tools, making it super easy to inject tweaks and mod your apps.",
+        icon: "https://github.com/username252510/Purple-Installer/blob/e5a8c1c36eb0f17b8ef40c29dcea49c1077be188/images/KsignLogo.jpg?raw=true",
+        warning: ""
+      },
+      sideinstaller: {
+        desc: "A game-changer for anyone who wants to sideload completely without a computer. It automates the entire SideStore setup right on your device by handling the annoying VPN and DNS configurations. This lets you install SideStore and refresh your apps entirely on your phone using a free personal Apple ID.",
+        icon: "https://github.com/username252510/Purple-Installer/blob/e5a8c1c36eb0f17b8ef40c29dcea49c1077be188/images/SideInstallerLogo.jpg?raw=true",
+        warning: "⚠️ Only available on iOS 27+ since it uses the wireless pairing feature."
+      }
+    };
+
     // Global variables storing references to active blobs and state sources
-    let activeCertSource = 'upload'; // Strictly tracks tab context ('upload' or 'saved')
+    let activeCertSource = 'upload'; // Tracks tab context ('upload' or 'saved')
     let activeP12File = null;
     let activeProvFile = null;
     let currentInstallLink = '';
@@ -299,13 +339,13 @@
     const form = document.getElementById('signerForm');
     const submitBtn = document.getElementById('submitBtn');
     const statusArea = document.getElementById('statusArea');
-    const resultBox = document.getElementById('resultBox');
     
     // UI Progress Bars
     const progressContainer = document.getElementById('progressContainer');
     const progressStatus = document.getElementById('progressStatus');
     const appSelect = document.getElementById('appSelect');
     const versionSelect = document.getElementById('versionSelect');
+    const appDescriptionContainer = document.getElementById('appDescriptionContainer');
 
     // Installer Input Fields
     const p12Input = document.getElementById('p12Input');
@@ -332,10 +372,12 @@
     const advancedContent = document.getElementById('advancedContent');
     const advancedArrow = document.getElementById('advancedArrow');
 
-    // QR Rendering
-    const qrBtn = document.getElementById('qrBtn');
-    const qrContainer = document.getElementById('qrContainer');
-    const qrCanvasWrapper = document.getElementById('qrCanvasWrapper');
+    // Success View Elements
+    const successQrBtn = document.getElementById('successQrBtn');
+    const successQrContainer = document.getElementById('successQrContainer');
+    const successQrCanvasWrapper = document.getElementById('successQrCanvasWrapper');
+    const successCopyBtn = document.getElementById('successCopyBtn');
+    const resetBtn = document.getElementById('resetBtn');
 
     // Helper: Escaping HTML values
     function escapeHtml(str) {
@@ -351,23 +393,42 @@
       const bubble = document.querySelector('.liquid-bubble');
       const instView = document.getElementById('installer-view');
       const certView = document.getElementById('certificates-view');
+      const successView = document.getElementById('success-view');
       const instBtn = document.querySelector('[data-route="installer"]');
       const certBtn = document.querySelector('[data-route="certificates"]');
 
+      // Reset and hide views by default
+      instView.classList.add('hidden');
+      certView.classList.add('hidden');
+      successView.classList.add('hidden');
+
       if (route === '#certificates') {
-        instView.classList.add('hidden');
         certView.classList.remove('hidden');
         instBtn.classList.remove('active');
         certBtn.classList.add('active');
-        if (bubble) bubble.style.transform = 'translateX(calc(100% + 8px))';
+        if (bubble) {
+          bubble.style.transform = 'translateX(calc(100% + 8px)) scale(1)';
+          bubble.style.opacity = '1';
+        }
         renderManagerList();
+      } else if (route === '#success') {
+        successView.classList.remove('hidden');
+        instBtn.classList.remove('active');
+        certBtn.classList.remove('active');
+        // Smoothly scale bubble away while browsing signed application metrics
+        if (bubble) {
+          bubble.style.transform = 'scale(0)';
+          bubble.style.opacity = '0';
+        }
       } else {
         // Default View (#installer)
-        certView.classList.add('hidden');
         instView.classList.remove('hidden');
         certBtn.classList.remove('active');
         instBtn.classList.add('active');
-        if (bubble) bubble.style.transform = 'translateX(0px)';
+        if (bubble) {
+          bubble.style.transform = 'translateX(0px) scale(1)';
+          bubble.style.opacity = '1';
+        }
         renderMainSavedCerts();
       }
       window.scrollTo(0, 0);
@@ -385,6 +446,31 @@
     // Event listeners to handle hash states automatically
     window.addEventListener('hashchange', handleRouting);
     window.addEventListener('load', handleRouting);
+
+
+    // ==========================================
+    // DYNAMIC DESCRIPTIONS & WARNINGS
+    // ==========================================
+    function updateAppDescription() {
+      const selectedApp = appSelect.value;
+      const data = APP_DESCRIPTIONS[selectedApp];
+      if (data) {
+        appDescriptionContainer.innerHTML = `
+          <img src="${data.icon}" alt="${selectedApp} Icon" class="app-desc-icon">
+          <div style="display: flex; flex-direction: column; flex: 1;">
+            <div class="app-desc-title">${APP_CONFIG[selectedApp].name}</div>
+            <div class="app-desc-text">${data.desc}</div>
+            ${data.warning ? `<div class="app-warning-box">${data.warning}</div>` : ''}
+          </div>
+        `;
+        appDescriptionContainer.classList.remove('hidden');
+      } else {
+        appDescriptionContainer.classList.add('hidden');
+      }
+    }
+
+    // Initialize description on first select load
+    updateAppDescription();
 
 
     // ==========================================
@@ -525,7 +611,7 @@
         } else {
           uploadFields.classList.add('hidden');
           savedFields.classList.remove('hidden');
-          passwordGroup.classList.add('hidden'); // Hide Password Box!
+          passwordGroup.classList.add('hidden'); // Hide Password Box
           
           activeCertSource = 'saved';
           // Swap pointers strictly to the selected saved certificate details
@@ -803,6 +889,7 @@
 
     appSelect.addEventListener('change', (e) => {
       updateVersions(e.target.value);
+      updateAppDescription();
     });
 
     toggleAdvanced.addEventListener('click', () => {
@@ -816,29 +903,31 @@
       }
     });
 
-    const copyBtn = document.getElementById('copyBtn');
-    copyBtn.addEventListener('click', async () => {
+    // ==========================================
+    // ACTION CONTROLS (Success View Operations)
+    // ==========================================
+    successCopyBtn.addEventListener('click', async () => {
       if (!currentInstallLink) return;
       try {
         await navigator.clipboard.writeText(currentInstallLink);
-        copyBtn.innerText = "Copied!";
-        copyBtn.style.background = "var(--success)";
-        copyBtn.style.borderColor = "var(--success)";
+        successCopyBtn.innerText = "Copied!";
+        successCopyBtn.style.background = "var(--success)";
+        successCopyBtn.style.borderColor = "var(--success)";
         setTimeout(() => {
-          copyBtn.innerText = "Copy Link";
-          copyBtn.style.background = "";
-          copyBtn.style.borderColor = "";
+          successCopyBtn.innerText = "Copy Link";
+          successCopyBtn.style.background = "";
+          successCopyBtn.style.borderColor = "";
         }, 2000);
       } catch (err) {
         alert("Failed to copy link: " + err);
       }
     });
 
-    qrBtn.addEventListener('click', () => {
+    successQrBtn.addEventListener('click', () => {
       if (!currentInstallLink) return;
-      const isHidden = qrContainer.classList.contains('hidden');
+      const isHidden = successQrContainer.classList.contains('hidden');
       if (isHidden) {
-        qrCanvasWrapper.innerHTML = '';
+        successQrCanvasWrapper.innerHTML = '';
         const canvas = document.createElement('canvas');
 
         QRCode.toCanvas(canvas, currentInstallLink, {
@@ -848,35 +937,39 @@
         }, function (error) {
             if (error) {
                 console.error(error);
-                qrCanvasWrapper.innerHTML = '<span style="font-size: 0.75rem; color: var(--error)">❌ Render Failed</span>';
+                successQrCanvasWrapper.innerHTML = '<span style="font-size: 0.75rem; color: var(--error)">❌ Render Failed</span>';
                 return;
             }
-            qrCanvasWrapper.appendChild(canvas);
+            successQrCanvasWrapper.appendChild(canvas);
         });
 
-        qrContainer.classList.remove('hidden');
-        qrBtn.innerText = "Hide QR";
-        qrBtn.style.background = "#1f2937";
-        qrBtn.style.borderColor = "#374151";
+        successQrContainer.classList.remove('hidden');
+        successQrBtn.innerText = "Hide QR";
+        successQrBtn.style.background = "#1f2937";
+        successQrBtn.style.borderColor = "#374151";
       } else {
-        qrContainer.classList.add('hidden');
-        qrBtn.innerText = "Show QR Code";
-        qrBtn.style.background = "";
-        qrBtn.style.borderColor = "";
+        successQrContainer.classList.add('hidden');
+        successQrBtn.innerText = "Show QR Code";
+        successQrBtn.style.background = "";
+        successQrBtn.style.borderColor = "";
       }
     });
 
+    // Install Another App (Deep Reset Core)
+    resetBtn.addEventListener('click', () => {
+      window.location.hash = '#installer';
+      window.location.reload(); // Performs clean client reset (leaves safe localStorage caches intact)
+    });
+
+    // ==========================================
+    // SIGN FORM SUBMISSION HANDLING
+    // ==========================================
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       statusArea.classList.add('hidden');
       statusArea.style.borderColor = '';
       statusArea.style.color = '';
-      resultBox.classList.add('hidden');
-      qrContainer.classList.add('hidden');
-      qrBtn.innerText = "Show QR Code";
-      qrBtn.style.background = "";
-      qrBtn.style.borderColor = "";
       submitBtn.disabled = true;
 
       progressContainer.classList.remove('hidden');
@@ -905,7 +998,7 @@
       const p12File = activeP12File;
       const provFile = activeProvFile;
       
-      // ISOLATE PASSWORD ACCORDING TO THE ACTIVE TAB SOURCE
+      // Isolate password context according to the active tab source selection
       let password = "";
       if (activeCertSource === 'upload') {
         password = passwordInput.value;
@@ -975,11 +1068,25 @@
         if (data.successes && data.successes.length > 0) {
           progressContainer.classList.add('hidden');
           const app = data.successes[0];
-          document.getElementById('appNameDisplay').innerText = `App Name: ${app.displayName}`;
-          document.getElementById('downloadBtn').href = app.signedIpaUrl;
-          document.getElementById('installBtn').href = app.installLink;
+          
+          // Source the precise icon path based on selections
+          const selectedAppMeta = APP_DESCRIPTIONS[appKey];
+          
+          // Populate success view payload metrics
+          document.getElementById('successAppIcon').src = selectedAppMeta ? selectedAppMeta.icon : "";
+          document.getElementById('successAppName').innerText = app.displayName;
+          document.getElementById('successDownloadBtn').href = app.signedIpaUrl;
+          document.getElementById('successInstallBtn').href = app.installLink;
           currentInstallLink = app.installLink;
-          resultBox.classList.remove('hidden');
+          
+          // Reset QR controls on successful view transition
+          successQrContainer.classList.add('hidden');
+          successQrBtn.innerText = "Show QR Code";
+          successQrBtn.style.background = "";
+          successQrBtn.style.borderColor = "";
+
+          // Redirect to inside success view path
+          window.location.hash = '#success';
         } else {
           const failureMsg = data.failures && data.failures.length > 0 
             ? data.failures[0].message || data.failures[0].error || "Sign process failed." 
