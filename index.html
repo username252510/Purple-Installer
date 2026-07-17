@@ -88,8 +88,8 @@
           </div>
         </div>
 
-        <!-- P12 Password Input (Shared across both modes) -->
-        <div class="form-group">
+        <!-- P12 Password Input (Shared across both modes - Hidden dynamically on Saved Certificates Tab) -->
+        <div class="form-group" id="passwordGroup">
           <label class="form-label">4. P12 Password</label>
           <div class="password-wrapper">
             <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)">
@@ -250,11 +250,11 @@
     <!-- Sliding Glass Highlight Indicator Bubble -->
     <div class="liquid-bubble"></div>
     
-    <a href="/Purple-Installer/" class="liquid-nav-item active" data-route="installer">
+    <a href="#installer" class="liquid-nav-item active" data-route="installer">
       <span class="liquid-nav-icon">📦</span>
       <span class="liquid-nav-label">Installer</span>
     </a>
-    <a href="/Purple-Installer/certificates/" class="liquid-nav-item" data-route="certificates">
+    <a href="#certificates" class="liquid-nav-item" data-route="certificates">
       <span class="liquid-nav-icon">🔑</span>
       <span class="liquid-nav-label">Certificates</span>
     </a>
@@ -284,7 +284,8 @@
       }
     };
 
-    // Global variables storing references to active blobs
+    // Global variables storing references to active blobs and state sources
+    let activeCertSource = 'upload'; // Strictly tracks tab context ('upload' or 'saved')
     let activeP12File = null;
     let activeProvFile = null;
     let currentInstallLink = '';
@@ -343,17 +344,17 @@
     }
 
     // ==========================================
-    // ROUTING SYSTEM (No-Refresh Native Feels)
+    // METHOD 1: ROUTING SYSTEM (Hash Routing Native Feels)
     // ==========================================
-    function navigateTo(path, updateState = true) {
-      const isCertificates = path.includes('/certificates');
+    function handleRouting() {
+      const route = window.location.hash || '#installer';
       const bubble = document.querySelector('.liquid-bubble');
       const instView = document.getElementById('installer-view');
       const certView = document.getElementById('certificates-view');
       const instBtn = document.querySelector('[data-route="installer"]');
       const certBtn = document.querySelector('[data-route="certificates"]');
 
-      if (isCertificates) {
+      if (route === '#certificates') {
         instView.classList.add('hidden');
         certView.classList.remove('hidden');
         instBtn.classList.remove('active');
@@ -361,6 +362,7 @@
         if (bubble) bubble.style.transform = 'translateX(calc(100% + 8px))';
         renderManagerList();
       } else {
+        // Default View (#installer)
         certView.classList.add('hidden');
         instView.classList.remove('hidden');
         certBtn.classList.remove('active');
@@ -368,31 +370,21 @@
         if (bubble) bubble.style.transform = 'translateX(0px)';
         renderMainSavedCerts();
       }
-
-      if (updateState && window.location.pathname !== path) {
-        history.pushState({ path: path }, '', path);
-      }
       window.scrollTo(0, 0);
     }
 
-    // Intercept clicks on navigation pills
+    // Intercept navigation pill clicks
     document.querySelectorAll('.liquid-nav-item').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
-        const path = item.getAttribute('href');
-        navigateTo(path);
+        const route = item.getAttribute('data-route');
+        window.location.hash = '#' + route;
       });
     });
 
-    // Handle forward/back gestures in iOS and Desktop
-    window.addEventListener('popstate', (e) => {
-      navigateTo(window.location.pathname, false);
-    });
-
-    // Handle initial state on load
-    window.addEventListener('DOMContentLoaded', () => {
-      navigateTo(window.location.pathname, false);
-    });
+    // Event listeners to handle hash states automatically
+    window.addEventListener('hashchange', handleRouting);
+    window.addEventListener('load', handleRouting);
 
 
     // ==========================================
@@ -400,11 +392,15 @@
     // ==========================================
     p12Input.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
-        activeP12File = e.target.files[0];
-        p12Label.querySelector('span').innerText = activeP12File.name;
+        if (activeCertSource === 'upload') {
+          activeP12File = e.target.files[0];
+        }
+        p12Label.querySelector('span').innerText = e.target.files[0].name;
         p12Label.classList.add('file-selected');
       } else {
-        activeP12File = null;
+        if (activeCertSource === 'upload') {
+          activeP12File = null;
+        }
         p12Label.querySelector('span').innerText = "Choose .p12 File";
         p12Label.classList.remove('file-selected');
       }
@@ -412,11 +408,15 @@
 
     provInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
-        activeProvFile = e.target.files[0];
-        provLabel.querySelector('span').innerText = activeProvFile.name;
+        if (activeCertSource === 'upload') {
+          activeProvFile = e.target.files[0];
+        }
+        provLabel.querySelector('span').innerText = e.target.files[0].name;
         provLabel.classList.add('file-selected');
       } else {
-        activeProvFile = null;
+        if (activeCertSource === 'upload') {
+          activeProvFile = null;
+        }
         provLabel.querySelector('span').innerText = "Choose .mobileprovision File";
         provLabel.classList.remove('file-selected');
       }
@@ -505,6 +505,7 @@
     const tabBtns = document.querySelectorAll('.cert-tab-btn');
     const uploadFields = document.getElementById('uploadCertFields');
     const savedFields = document.getElementById('savedCertFields');
+    const passwordGroup = document.getElementById('passwordGroup');
 
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -515,16 +516,33 @@
         if (target === 'upload') {
           uploadFields.classList.remove('hidden');
           savedFields.classList.add('hidden');
+          passwordGroup.classList.remove('hidden'); // Show Password Box
           
-          // Fall back active targets to local uploaded file items
-          if (p12Input.files.length > 0) activeP12File = p12Input.files[0];
-          else activeP12File = null;
-
-          if (provInput.files.length > 0) activeProvFile = provInput.files[0];
-          else activeProvFile = null;
+          activeCertSource = 'upload';
+          // Swap pointers strictly back to user-uploaded items (if any)
+          activeP12File = p12Input.files[0] || null;
+          activeProvFile = provInput.files[0] || null;
         } else {
           uploadFields.classList.add('hidden');
           savedFields.classList.remove('hidden');
+          passwordGroup.classList.add('hidden'); // Hide Password Box!
+          
+          activeCertSource = 'saved';
+          // Swap pointers strictly to the selected saved certificate details
+          if (selectedCertId) {
+            const certs = getSavedCerts();
+            const cert = certs.find(c => c.id === selectedCertId);
+            if (cert) {
+              activeP12File = base64ToFile(cert.p12Data, cert.p12Name);
+              activeProvFile = base64ToFile(cert.provData, cert.provName);
+            } else {
+              activeP12File = null;
+              activeProvFile = null;
+            }
+          } else {
+            activeP12File = null;
+            activeProvFile = null;
+          }
           renderMainSavedCerts();
         }
       });
@@ -538,7 +556,7 @@
         container.innerHTML = `
           <div class="empty-certs-container">
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">You don't have any saved certificates yet.</p>
-            <button type="button" class="btn" style="min-height: 38px; font-size: 0.8rem; width: auto; margin: 0 auto; display: inline-flex; padding: 0.5rem 1rem;" onclick="navigateTo('/Purple-Installer/certificates/')">
+            <button type="button" class="btn" style="min-height: 38px; font-size: 0.8rem; width: auto; margin: 0 auto; display: inline-flex; padding: 0.5rem 1rem;" onclick="window.location.hash = '#certificates'">
               Go to Certificates Page
             </button>
           </div>
@@ -563,10 +581,17 @@
         `;
         
         box.addEventListener('click', () => {
-          selectedCertId = cert.id;
-          activeP12File = base64ToFile(cert.p12Data, cert.p12Name);
-          activeProvFile = base64ToFile(cert.provData, cert.provName);
-          passwordInput.value = cert.password || "";
+          if (selectedCertId === cert.id) {
+            // TAPPED AGAIN: DE-SELECT
+            selectedCertId = null;
+            activeP12File = null;
+            activeProvFile = null;
+          } else {
+            // SELECT
+            selectedCertId = cert.id;
+            activeP12File = base64ToFile(cert.p12Data, cert.p12Name);
+            activeProvFile = base64ToFile(cert.provData, cert.provName);
+          }
           renderMainSavedCerts();
         });
 
@@ -879,7 +904,21 @@
 
       const p12File = activeP12File;
       const provFile = activeProvFile;
-      const password = passwordInput.value;
+      
+      // ISOLATE PASSWORD ACCORDING TO THE ACTIVE TAB SOURCE
+      let password = "";
+      if (activeCertSource === 'upload') {
+        password = passwordInput.value;
+      } else {
+        if (selectedCertId) {
+          const certs = getSavedCerts();
+          const cert = certs.find(c => c.id === selectedCertId);
+          if (cert) {
+            password = cert.password || "";
+          }
+        }
+      }
+
       const permInstallChecked = document.getElementById('permInstallToggle').checked;
       const appKey = appSelect.value;
       const appConfig = APP_CONFIG[appKey];
