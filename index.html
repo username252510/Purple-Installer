@@ -27,7 +27,7 @@
       <div class="header-logo-container">
         <img src="https://github.com/username252510/Purple-Installer/blob/dcd6c78e91abd8819dc25f98b03bffb9f7abb528/images/PurpleInstallerLogo.png?raw=true" alt="Purple Installer Logo" class="installer-logo">
         <h1>Purple Installer</h1>
-        <p class="tagline">Sideload apps directly from official GitHub releases using Daisign</p>
+        <p class="tagline">Instantly Sideload apps directly from official GitHub releases</p>
         
         <a href="https://github.com/username252510/Purple-Installer" target="_blank" rel="noopener noreferrer" class="github-btn">
           <img src="https://github.com/username252510/Purple-Installer/blob/dcd6c78e91abd8819dc25f98b03bffb9f7abb528/images/PurpleGithubLogo.png?raw=true" alt="GitHub Logo" class="github-icon">
@@ -39,7 +39,7 @@
         
         <!-- 1. APPLICATION SELECTOR -->
         <div class="form-group">
-          <label class="form-label">1. Select Application</label>
+          <label class="form-label">Select Application</label>
           <select id="appSelect">
             <option value="feather">Feather</option>
             <option value="ksign">Ksign</option>
@@ -52,7 +52,7 @@
 
         <!-- 2. VERSION SELECTOR -->
         <div class="form-group">
-          <label class="form-label">2. Select Version</label>
+          <label class="form-label">Select Version</label>
           <select id="versionSelect" disabled>
             <option value="">Loading versions...</option>
           </select>
@@ -60,7 +60,7 @@
 
         <!-- 3. CERTIFICATE SELECTOR TABS -->
         <div class="form-group">
-          <label class="form-label">3. Select Certificate Source</label>
+          <label class="form-label">Select Certificate Source</label>
           
           <!-- Aesthetic Browser Tabs Selector -->
           <div class="cert-tab-selector">
@@ -103,7 +103,7 @@
 
         <!-- P12 Password Input (Shared across both modes - Hidden dynamically on Saved Certificates Tab) -->
         <div class="form-group" id="passwordGroup">
-          <label class="form-label">4. P12 Password</label>
+          <label class="form-label">P12 Password</label>
           <div class="password-wrapper">
             <input type="password" id="passwordInput" placeholder="Enter certificate password (leave blank if none)">
             <button type="button" id="togglePasswordBtn" class="password-toggle-btn">Show</button>
@@ -113,13 +113,13 @@
         <!-- PERMANENT INSTALL ACCORDION -->
         <div class="form-group" style="border: 2px solid var(--border); border-radius: 8px; overflow: hidden; background: #0f131c;">
           <button type="button" id="toggleAdvanced" style="width: 100%; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; background: transparent; border: 0; color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-            <span>🔗 Permanent Install Option</span>
+            <span>🔗 Permanent Install Link</span>
             <span id="advancedArrow" style="transition: transform 0.2s ease;">▼</span>
           </button>
           
           <div id="advancedContent" class="hidden" style="padding: 1rem; border-top: 2px solid var(--border); text-align: left;">
             <div style="padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; color: #fbbf24; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem;">
-              ⚠️ <strong>Permanent Install Notice:</strong> Permanent links rely on the server's GitHub storage. This often hits limits ("file_count limited to 1000 assets per release") and may fail to sign. Use only if you need a link to share.
+              ⚠️ <strong>Permanent Install Notice:</strong> Due to how the Daisuke Signer backend is set up, permanent links often fail as they rely on the server's GitHub storage. This often hits limits ("file_count limited to 1000 assets per release"). Use only if you need a link to share.
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -164,18 +164,18 @@
   <div id="certificates-view" class="container hidden">
     <div class="custom-card">
       <h1>Certificates</h1>
-      <p class="tagline">Store development credentials securely in your native local storage</p>
+      <p class="tagline">Store certificates securely in your native local storage</p>
 
       <!-- Store Form -->
       <form id="saveCertForm" style="margin-bottom: 2rem;">
         
         <div class="form-group">
-          <label class="form-label">1. Certificate Name</label>
+          <label class="form-label">Certificate Name</label>
           <input type="text" id="newCertName" placeholder="e.g. MapleSign, Feather Dev" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">2. Upload Certificate (.p12)</label>
+          <label class="form-label">Upload Certificate (.p12)</label>
           <label for="mgrP12Input" class="file-upload-label" id="mgrP12Label">
             <span>Choose .p12 File</span>
           </label>
@@ -183,7 +183,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">3. Provisioning Profile (.mobileprovision)</label>
+          <label class="form-label">Provisioning Profile (.mobileprovision)</label>
           <label for="mgrProvInput" class="file-upload-label" id="mgrProvLabel">
             <span>Choose .mobileprovision File</span>
           </label>
@@ -191,7 +191,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">4. Password</label>
+          <label class="form-label">Password</label>
           <div class="password-wrapper">
             <input type="password" id="mgrPasswordInput" placeholder="Certificate password (leave blank if none)">
             <button type="button" id="toggleMgrPasswordBtn" class="password-toggle-btn">Show</button>
@@ -229,7 +229,7 @@
       <h1 style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem;">
         App Signed!
       </h1>
-      <p class="tagline">Your customized payload is ready for deployment</p>
+      <p class="tagline">Your signed app is ready to be installed</p>
 
       <!-- Clean Center Layout for App Icon and Metadata -->
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 2rem 0; gap: 1rem;">
@@ -810,7 +810,7 @@
     }
 
     deleteAllCertsBtn.addEventListener('click', () => {
-      const confirmation = confirm("⚠️ Are you absolutely sure? This action will completely and permanently wipe all saved credentials from your device's browser cache.");
+      const confirmation = confirm("⚠️ Are you absolutely sure? This action will permanently wipe all saved certificates from your device's browser cache.");
       if (confirmation) {
         localStorage.removeItem("purple_installer_certs");
         selectedCertId = null;
@@ -1049,7 +1049,7 @@
       }
 
       formData.append("ipaUrls", JSON.stringify([selectedIpaUrl]));
-      progressStatus.innerText = `Deploying data for ${appConfig.name} to Daisign...`;
+      progressStatus.innerText = `Preparing ${appConfig.name} for signing...`;
 
       const modifications = {
         [filename]: {
