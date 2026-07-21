@@ -113,6 +113,62 @@ body::before {
 }
 
 /* ==========================================================================
+   HEADER LOGO & GITHUB BUTTON STYLING
+   ========================================================================== */
+.header-logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.installer-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 22%;
+  object-fit: cover;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 18px var(--accent-glow);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.github-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  background: #11151f;
+  border: 2px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.825rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  margin-bottom: 1.25rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.github-btn:hover {
+  border-color: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.github-btn:active {
+  transform: scale(0.96);
+}
+
+.github-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* ==========================================================================
    TYPOGRAPHY
    ========================================================================== */
 h1 {
@@ -131,7 +187,7 @@ h1 {
   text-align: center;
   font-size: 0.9rem;
   color: var(--text-muted);
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
 }
 
 /* ==========================================================================
